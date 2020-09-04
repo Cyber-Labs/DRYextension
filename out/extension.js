@@ -2,15 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
-const transform_1 = require("./transform");
+const transform_1 = require("./transform/transform");
 function activate(context) {
     console.log('Congratulations, your extension "dryco" is now active!');
     let disposable = vscode.commands.registerCommand('dryco.convertToArrowFunction', () => {
         const code = readCode();
-        const transformedCode = transform_1.transform(code);
+        const transformedCode = transform_1.transformToArrow(code);
         write(transformedCode);
     });
     context.subscriptions.push(disposable);
+    context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
+        const code = readCode();
+        const transformedCode = transform_1.detectClone(code);
+        write(transformedCode);
+    }));
 }
 exports.activate = activate;
 function readCode() {

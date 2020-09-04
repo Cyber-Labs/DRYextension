@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import {transform} from './transform';
+import {transformToArrow, detectClone} from './transform/transform';
+import { Transform } from 'stream';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -8,12 +9,23 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('dryco.convertToArrowFunction', () => {
 
 		const code = readCode();
-		const transformedCode = transform(code);
+		const transformedCode = transformToArrow(code);
 		write(transformedCode);
 
 	});
 
 	context.subscriptions.push(disposable);
+
+	context.subscriptions.push(
+		vscode.commands.registerCommand('dryco.detectClone', () => {
+
+			const code = readCode();
+			const transformedCode = detectClone(code);
+			write(transformedCode);
+	
+		})
+	);
+
 }
 
 function readCode(): string {
