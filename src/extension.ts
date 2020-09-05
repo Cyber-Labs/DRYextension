@@ -1,7 +1,5 @@
 import * as vscode from 'vscode';
-import {transformToArrow, detectClone} from './transform/transform';
-import { Transform } from 'stream';
-import { updateDiags } from "./transform/transform";
+import {transformToArrow, detectClone, updateDiags} from './transform/transform';
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -22,18 +20,17 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const code = readCode();
 			const transformedCode = detectClone(code);
-			const diag_coll = vscode.languages.createDiagnosticCollection('basic-lint-1');
+			const diagColl = vscode.languages.createDiagnosticCollection('basic-lint-1');
 			if (vscode.window.activeTextEditor) {
-				updateDiags(vscode.window.activeTextEditor.document, diag_coll);
+				updateDiags(vscode.window.activeTextEditor.document, diagColl);
 			}
 			context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
 				(e: vscode.TextEditor | undefined) => {
 					if (e !== undefined) {
-						updateDiags(e.document, diag_coll);
+						updateDiags(e.document, diagColl);
 					}
 				}));
-			console.log(vscode.Diagnostic)
-			// write(transformedCode);
+			write(transformedCode);
 	
 		})
 	);

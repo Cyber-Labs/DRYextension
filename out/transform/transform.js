@@ -62,7 +62,7 @@ function detectClone(code) {
                             repInstanceSt.push(path2.node.loc ? { line: path2.node.loc.start.line, column: path2.node.loc.start.column } : { line: 0, column: 0 });
                             repInstanceEnd.push(path2.node.loc ? { line: path2.node.loc.end.line, column: path2.node.loc.end.column } : { line: 0, column: 0 });
                             // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
-                            vscode.window.showInformationMessage(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line : ""}:${path1.node.loc ? path1.node.loc.end.line : ""} and ${path2.node.loc ? path2.node.loc.start.line : ""}:${path2.node.loc ? path2.node.loc.end.line : ""}`);
+                            vscode.window.showInformationMessage(`Structurally similar code detected at lines ${path1.node.loc ? path1.node.loc.start.line : ""}:${path1.node.loc ? path1.node.loc.end.line : ""} and ${path2.node.loc ? path2.node.loc.start.line : ""}:${path2.node.loc ? path2.node.loc.end.line : ""}`);
                         }
                     }
                 }
@@ -73,19 +73,19 @@ function detectClone(code) {
 }
 exports.detectClone = detectClone;
 function updateDiags(document, collection) {
-    var diag1;
+    let diag1;
     firstInstanceSt.forEach((instance, index) => {
         diag1 = new vscode.Diagnostic(new vscode.Range(new vscode.Position(instance.line, instance.column), new vscode.Position(firstInstanceEnd[index].line, firstInstanceEnd[index].column)), 'WET Code detected!', vscode.DiagnosticSeverity.Warning);
         diag1.source = 'basic-lint';
-        diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
+        diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(new vscode.Position(repInstanceSt[index].line, repInstanceSt[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
         diag1.code = 102;
-        if (document && Path.basename(document.uri.fsPath) === 'test.bas') {
+        if (document && Path.basename(document.uri.fsPath)) {
             collection.set(document.uri, [diag1]);
         }
         else {
             collection.clear();
         }
-        console.log(collection);
+        // console.log(diag1);
     });
 }
 exports.updateDiags = updateDiags;
