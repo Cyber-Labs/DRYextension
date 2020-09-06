@@ -31,20 +31,26 @@ function toArrowFunction(node) {
     return t.variableDeclaration("const", [declarator]);
 }
 // detect clone
-function detectClone(code) {
+function detectClone(code, code2) {
     const ast = parser_1.parse(code);
-    // traverse(ast, {
-    //     Identifier(path) {
-    //         path.node.name = "a";
-    //       }
-    // });
+    const ast2 = parser_1.parse(code2);
     traverse_1.default(ast, {
         FunctionDeclaration(path1) {
-            traverse_1.default(ast, {
+            traverse_1.default(ast2, {
                 FunctionDeclaration(path2) {
                     if (path1.node !== path2.node) {
                         const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
                         const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
+                        traverse_1.default(ast1, {
+                            Identifier(path) {
+                                path.node.name = "a";
+                            }
+                        });
+                        traverse_1.default(ast2, {
+                            Identifier(path) {
+                                path.node.name = "a";
+                            }
+                        });
                         if (path1.node.loc && path2.node.loc) {
                             compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
                         }
@@ -53,36 +59,36 @@ function detectClone(code) {
             });
         }
     });
-    traverse_1.default(ast, {
-        IfStatement(path1) {
-            traverse_1.default(ast, {
-                IfStatement(path2) {
-                    if (path1.node !== path2.node) {
-                        const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
-                        const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
-                        if (path1.node.loc && path2.node.loc) {
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-                        }
-                    }
-                }
-            });
-        }
-    });
-    traverse_1.default(ast, {
-        VariableDeclaration(path1) {
-            traverse_1.default(ast, {
-                VariableDeclaration(path2) {
-                    if (path1.node !== path2.node) {
-                        const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
-                        const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
-                        if (path1.node.loc && path2.node.loc) {
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-                        }
-                    }
-                }
-            });
-        }
-    });
+    // traverse(ast, {
+    //     IfStatement(path1) {
+    //         traverse(ast, {
+    //             IfStatement(path2){
+    //                 if(path1.node!==path2.node){
+    //                     const ast1 = parse((generate(parse(path1.toString()))).code);
+    //                     const ast2 = parse((generate(parse(path2.toString()))).code);
+    //                     if(path1.node.loc && path2.node.loc){
+    //                         compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // });
+    // traverse(ast, {
+    //     VariableDeclaration(path1) {
+    //         traverse(ast, {
+    //             VariableDeclaration(path2){
+    //                 if(path1.node!==path2.node){
+    //                     const ast1 = parse((generate(parse(path1.toString()))).code);
+    //                     const ast2 = parse((generate(parse(path2.toString()))).code);
+    //                     if(path1.node.loc && path2.node.loc){
+    //                         compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // });
     // traverse(ast, {
     //     BlockStatement(path1) {
     //         traverse(ast, {

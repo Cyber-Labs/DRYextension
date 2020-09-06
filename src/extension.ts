@@ -1,5 +1,7 @@
 import * as vscode from 'vscode';
 import {transformToArrow, detectClone, updateDiags} from './transform/transform';
+import * as fs from 'fs';
+
 
 export function activate(context: vscode.ExtensionContext) {
 
@@ -19,22 +21,42 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('dryco.detectClone', () => {
 
 			const code = readCode();
-			const transformedCode = detectClone(code);
+
+			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+
+			if(currPath){
+				var pathArray = currPath.split("\\");
+				pathArray.pop();
+				currPath = pathArray.join('\\');
+				fs.readdir(currPath, (err, files: string[]) => {
+					files.forEach((file) => {
+						const uri = vscode.Uri.file(file);
+						var code2;
+
+						fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+							if (err) {throw err;}
+							const transformedCode = detectClone(code, data);
+						  });
+
+
+					});
+				});
+			}
+
+
+
+
 			const editor = vscode.window.activeTextEditor;
 			if(!editor) {
 				throw new Error("No active editor");
 			}
-			const diagColl = vscode.languages.createDiagnosticCollection(`Dryo ${editor}`);
+			const diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
 			if (vscode.window.activeTextEditor) {
 				updateDiags(vscode.window.activeTextEditor.document, diagColl);
 			}
-			// context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
-			// 	(e: vscode.TextEditor | undefined) => {
-			// 		if (e !== undefined) {
-			// 			updateDiags(e.document, diagColl);
-			// 		}
-			// 	}));
-			write(transformedCode);
+
+			
+			// write(transformedCode);
 	
 		})
 	);

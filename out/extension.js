@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 const transform_1 = require("./transform/transform");
+const fs = require("fs");
 function activate(context) {
     console.log('Congratulations, your extension "dryco" is now active!');
     let disposable = vscode.commands.registerCommand('dryco.convertToArrowFunction', () => {
@@ -12,23 +13,35 @@ function activate(context) {
     });
     context.subscriptions.push(disposable);
     context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
+        var _a;
         const code = readCode();
-        const transformedCode = transform_1.detectClone(code);
+        var currPath = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
+        if (currPath) {
+            var pathArray = currPath.split("\\");
+            pathArray.pop();
+            currPath = pathArray.join('\\');
+            fs.readdir(currPath, (err, files) => {
+                files.forEach((file) => {
+                    const uri = vscode.Uri.file(file);
+                    var code2;
+                    fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+                        if (err) {
+                            throw err;
+                        }
+                        const transformedCode = transform_1.detectClone(code, data);
+                    });
+                });
+            });
+        }
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             throw new Error("No active editor");
         }
-        const diagColl = vscode.languages.createDiagnosticCollection(`Dryo ${editor}`);
+        const diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
         if (vscode.window.activeTextEditor) {
             transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
-        // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
-        // 	(e: vscode.TextEditor | undefined) => {
-        // 		if (e !== undefined) {
-        // 			updateDiags(e.document, diagColl);
-        // 		}
-        // 	}));
-        write(transformedCode);
+        // write(transformedCode);
     }));
 }
 exports.activate = activate;

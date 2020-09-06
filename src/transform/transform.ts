@@ -6,8 +6,6 @@ import traverse, { NodePath } from "@babel/traverse";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
 import * as Path from 'path';
-import { downloadAndUnzipVSCode } from "vscode-test";
-
 
 var firstInstanceSt:{line:number,column:number}[] = [];
 var firstInstanceEnd:{line:number,column:number}[] = [];
@@ -38,20 +36,27 @@ function toArrowFunction(node: t.FunctionDeclaration): t.VariableDeclaration {
 }
 
 // detect clone
-export function detectClone(code: string): string {
+export function detectClone(code: string, code2: string): string {
+
     const ast = parse(code);
-    // traverse(ast, {
-    //     Identifier(path) {
-    //         path.node.name = "a";
-    //       }
-    // });
+    const ast2 = parse(code2)
     traverse(ast, {
         FunctionDeclaration(path1) {
-            traverse(ast, {
+            traverse(ast2, {
                 FunctionDeclaration(path2){
                     if(path1.node!==path2.node){
                         const ast1 = parse((generate(parse(path1.toString()))).code);
                         const ast2 = parse((generate(parse(path2.toString()))).code);
+                        traverse(ast1, {
+                            Identifier(path) {
+                                path.node.name = "a";
+                            }
+                        });
+                        traverse(ast2, {
+                            Identifier(path) {
+                                path.node.name = "a";
+                            }
+                        });
                         if(path1.node.loc && path2.node.loc){
                             compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
                         }
@@ -61,37 +66,37 @@ export function detectClone(code: string): string {
         }
     });
     
-    traverse(ast, {
-        IfStatement(path1) {
-            traverse(ast, {
-                IfStatement(path2){
-                    if(path1.node!==path2.node){
-                        const ast1 = parse((generate(parse(path1.toString()))).code);
-                        const ast2 = parse((generate(parse(path2.toString()))).code);
-                        if(path1.node.loc && path2.node.loc){
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-                        }
-                    }
-                }
-            });
-        }
-    });
+    // traverse(ast, {
+    //     IfStatement(path1) {
+    //         traverse(ast, {
+    //             IfStatement(path2){
+    //                 if(path1.node!==path2.node){
+    //                     const ast1 = parse((generate(parse(path1.toString()))).code);
+    //                     const ast2 = parse((generate(parse(path2.toString()))).code);
+    //                     if(path1.node.loc && path2.node.loc){
+    //                         compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // });
 
-    traverse(ast, {
-        VariableDeclaration(path1) {
-            traverse(ast, {
-                VariableDeclaration(path2){
-                    if(path1.node!==path2.node){
-                        const ast1 = parse((generate(parse(path1.toString()))).code);
-                        const ast2 = parse((generate(parse(path2.toString()))).code);
-                        if(path1.node.loc && path2.node.loc){
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-                        }
-                    }
-                }
-            });
-        }
-    });
+    // traverse(ast, {
+    //     VariableDeclaration(path1) {
+    //         traverse(ast, {
+    //             VariableDeclaration(path2){
+    //                 if(path1.node!==path2.node){
+    //                     const ast1 = parse((generate(parse(path1.toString()))).code);
+    //                     const ast2 = parse((generate(parse(path2.toString()))).code);
+    //                     if(path1.node.loc && path2.node.loc){
+    //                         compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // });
 
     // traverse(ast, {
     //     BlockStatement(path1) {
