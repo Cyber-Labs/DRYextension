@@ -20,16 +20,20 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const code = readCode();
 			const transformedCode = detectClone(code);
-			const diagColl = vscode.languages.createDiagnosticCollection('basic-lint-1');
+			const editor = vscode.window.activeTextEditor;
+			if(!editor) {
+				throw new Error("No active editor");
+			}
+			const diagColl = vscode.languages.createDiagnosticCollection(`Dryo ${editor}`);
 			if (vscode.window.activeTextEditor) {
 				updateDiags(vscode.window.activeTextEditor.document, diagColl);
 			}
-			context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
-				(e: vscode.TextEditor | undefined) => {
-					if (e !== undefined) {
-						updateDiags(e.document, diagColl);
-					}
-				}));
+			// context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
+			// 	(e: vscode.TextEditor | undefined) => {
+			// 		if (e !== undefined) {
+			// 			updateDiags(e.document, diagColl);
+			// 		}
+			// 	}));
 			write(transformedCode);
 	
 		})
