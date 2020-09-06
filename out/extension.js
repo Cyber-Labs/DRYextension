@@ -14,7 +14,7 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
         const code = readCode();
         const transformedCode = transform_1.detectClone(code);
-        const diagColl = vscode.languages.createDiagnosticCollection('basic-lint-1');
+        const diagColl = vscode.languages.createDiagnosticCollection('dryco');
         if (vscode.window.activeTextEditor) {
             transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }

@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {parse} from "@babel/parser";
 import * as vscode from 'vscode';
 import template from "@babel/template";
-import traverse from "@babel/traverse";
+import traverse, { NodePath } from "@babel/traverse";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
 import * as Path from 'path';
@@ -51,32 +52,86 @@ export function detectClone(code: string): string {
                     if(path1.node!==path2.node){
                         const ast1 = parse((generate(parse(path1.toString()))).code);
                         const ast2 = parse((generate(parse(path2.toString()))).code);
-                        traverse(ast1, {
-                            Identifier(path) {
-                                path.node.name = "a";
-                            }
-                        });
-                        traverse(ast2, {
-                            Identifier(path) {
-                                path.node.name = "a";
-                            }
-                        });
-                        console.log(generate(ast1).code === generate(ast2).code);
-                        // console.log(path1.node.loc?.start)
-                        if(generate(ast1).code === generate(ast2).code){
-                            firstInstanceSt.push(path1.node.loc ? { line : path1.node.loc.start.line,column : path1.node.loc.start.column}:{line:0,column:0});
-                            firstInstanceEnd.push(path1.node.loc ? {line : path1.node.loc.end.line,column : path1.node.loc.end.column}:{line:0,column:0});
-                            repInstanceSt.push(path2.node.loc ? {line : path2.node.loc.start.line,column : path2.node.loc.start.column}:{line:0,column:0});
-                            repInstanceEnd.push(path2.node.loc ? {line : path2.node.loc.end.line,column : path2.node.loc.end.column}:{line:0,column:0});
-                            // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
-                            vscode.window.showInformationMessage(`Structurally similar code detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
+                        if(path1.node.loc && path2.node.loc){
+                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
                         }
                     }
                 }
             });
         }
     });
+    
+    traverse(ast, {
+        IfStatement(path1) {
+            traverse(ast, {
+                IfStatement(path2){
+                    if(path1.node!==path2.node){
+                        const ast1 = parse((generate(parse(path1.toString()))).code);
+                        const ast2 = parse((generate(parse(path2.toString()))).code);
+                        if(path1.node.loc && path2.node.loc){
+                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    traverse(ast, {
+        VariableDeclaration(path1) {
+            traverse(ast, {
+                VariableDeclaration(path2){
+                    if(path1.node!==path2.node){
+                        const ast1 = parse((generate(parse(path1.toString()))).code);
+                        const ast2 = parse((generate(parse(path2.toString()))).code);
+                        if(path1.node.loc && path2.node.loc){
+                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+                        }
+                    }
+                }
+            });
+        }
+    });
+
+    // traverse(ast, {
+    //     BlockStatement(path1) {
+    //         traverse(ast, {
+    //             BlockStatement(path2){
+    //                 if(path1.node!==path2.node){
+    //                     const ast1 = parse((generate(parse(path1.toString()))).code);
+    //                     const ast2 = parse((generate(parse(path2.toString()))).code);
+    //                     if(path1.node.loc && path2.node.loc){
+    //                         compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+    //                     }
+    //                 }
+    //             }
+    //         });
+    //     }
+    // });
     return generate(ast).code;
+}
+
+function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.SourceLocation): void {
+    traverse(ast1, {
+        Identifier(path) {
+            path.node.name = "a";
+        }
+    });
+    traverse(ast2, {
+        Identifier(path) {
+            path.node.name = "a";
+        }
+    });
+    // console.log(generate(ast1).code === generate(ast2).code);
+    // console.log(path1.node.loc?.start)
+    if(generate(ast1).code === generate(ast2).code){
+        firstInstanceSt.push(loc1 ? { line : loc1.start.line,column : loc1.start.column}:{line:0,column:0});
+        firstInstanceEnd.push(loc1 ? {line : loc1.end.line,column : loc1.end.column}:{line:0,column:0});
+        repInstanceSt.push(loc2 ? {line : loc2.start.line,column : loc2.start.column}:{line:0,column:0});
+        repInstanceEnd.push(loc2 ? {line : loc2.end.line,column : loc2.end.column}:{line:0,column:0});
+        // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
+        vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line:""}:${loc1 ? loc1.end.line:""} and ${loc2 ? loc2.start.line:""}:${loc2 ? loc2.end.line:""}`);
+    }
 }
 
 export function updateDiags(document: vscode.TextDocument,
@@ -90,7 +145,7 @@ export function updateDiags(document: vscode.TextDocument,
                 'WET Code detected!',
                 vscode.DiagnosticSeverity.Warning,
             );
-            diag1.source = 'basic-lint';
+            diag1.source = 'dryco';
             diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(
                 new vscode.Location(document.uri,
                     new vscode.Range( new vscode.Position(repInstanceSt[index].line,repInstanceSt[index].column),  new vscode.Position(repInstanceEnd[index].line,repInstanceEnd[index].column))),

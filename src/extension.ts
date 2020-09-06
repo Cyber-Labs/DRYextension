@@ -20,7 +20,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const code = readCode();
 			const transformedCode = detectClone(code);
-			const diagColl = vscode.languages.createDiagnosticCollection('basic-lint-1');
+			const diagColl = vscode.languages.createDiagnosticCollection('dryco');
 			if (vscode.window.activeTextEditor) {
 				updateDiags(vscode.window.activeTextEditor.document, diagColl);
 			}
