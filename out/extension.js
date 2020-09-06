@@ -14,15 +14,24 @@ function activate(context) {
     context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
         const code = readCode();
         const transformedCode = transform_1.detectClone(code);
+<<<<<<< HEAD
         const diagColl = vscode.languages.createDiagnosticCollection('dryco');
+=======
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+            throw new Error("No active editor");
+        }
+        const diagColl = vscode.languages.createDiagnosticCollection(`Dryo ${editor}`);
+>>>>>>> e9e4f4db0bb86adde9c7cf616635d19c8a67d7be
         if (vscode.window.activeTextEditor) {
             transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
-        context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor((e) => {
-            if (e !== undefined) {
-                transform_1.updateDiags(e.document, diagColl);
-            }
-        }));
+        // context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
+        // 	(e: vscode.TextEditor | undefined) => {
+        // 		if (e !== undefined) {
+        // 			updateDiags(e.document, diagColl);
+        // 		}
+        // 	}));
         write(transformedCode);
     }));
 }
