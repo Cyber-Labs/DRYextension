@@ -47,16 +47,6 @@ export function detectClone(code: string, code2: string): string {
                     if(path1.node!==path2.node){
                         const ast1 = parse((generate(parse(path1.toString()))).code);
                         const ast2 = parse((generate(parse(path2.toString()))).code);
-                        traverse(ast1, {
-                            Identifier(path) {
-                                path.node.name = "a";
-                            }
-                        });
-                        traverse(ast2, {
-                            Identifier(path) {
-                                path.node.name = "a";
-                            }
-                        });
                         if(path1.node.loc && path2.node.loc){
                             compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
                         }
