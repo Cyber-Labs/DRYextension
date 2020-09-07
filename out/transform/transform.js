@@ -12,6 +12,7 @@ var firstInstanceSt = [];
 var firstInstanceEnd = [];
 var repInstanceSt = [];
 var repInstanceEnd = [];
+var uriSecond = [];
 // Convert Normal function to Arrow function
 function transformToArrow(code) {
     const ast = parser_1.parse(code);
@@ -31,52 +32,24 @@ function toArrowFunction(node) {
     return t.variableDeclaration("const", [declarator]);
 }
 // detect clone
-function detectClone(code, code2) {
+function detectClone(code, code2, secondURI) {
     const ast = parser_1.parse(code);
     const ast2 = parser_1.parse(code2);
     traverse_1.default(ast, {
         FunctionDeclaration(path1) {
             traverse_1.default(ast2, {
                 FunctionDeclaration(path2) {
-                    if (path1.node !== path2.node) {
+                    if (path1.node != path2.node) {
                         const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
                         const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
-<<<<<<< HEAD
                         if (path1.node.loc && path2.node.loc) {
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-=======
-                        traverse_1.default(ast1, {
-                            Identifier(path) {
-                                path.node.name = "a";
-                            }
-                        });
-                        traverse_1.default(ast2, {
-                            Identifier(path) {
-                                path.node.name = "a";
-                            }
-                        });
-<<<<<<< HEAD
-                        if (path1.node.loc && path2.node.loc) {
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-=======
-                        console.log(generator_1.default(ast1).code === generator_1.default(ast2).code);
-                        // console.log(path1.node.loc?.start)
-                        if (generator_1.default(ast1).code === generator_1.default(ast2).code) {
-                            firstInstanceSt.push(path1.node.loc ? { line: path1.node.loc.start.line, column: path1.node.loc.start.column } : { line: 0, column: 0 });
-                            firstInstanceEnd.push(path1.node.loc ? { line: path1.node.loc.end.line, column: path1.node.loc.end.column } : { line: 0, column: 0 });
-                            repInstanceSt.push(path2.node.loc ? { line: path2.node.loc.start.line, column: path2.node.loc.start.column } : { line: 0, column: 0 });
-                            repInstanceEnd.push(path2.node.loc ? { line: path2.node.loc.end.line, column: path2.node.loc.end.column } : { line: 0, column: 0 });
-                            // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
-                            // vscode.window.showInformationMessage(`Structurally similar code detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
->>>>>>> e9e4f4db0bb86adde9c7cf616635d19c8a67d7be
->>>>>>> 675be4bdc18ad440b7647d7cd55b65bd75774b0d
+                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc, secondURI);
                         }
                     }
                 }
             });
         }
     });
-<<<<<<< HEAD
     // traverse(ast, {
     //     IfStatement(path1) {
     //         traverse(ast, {
@@ -107,38 +80,6 @@ function detectClone(code, code2) {
     //         });
     //     }
     // });
-=======
-    traverse_1.default(ast, {
-        IfStatement(path1) {
-            traverse_1.default(ast, {
-                IfStatement(path2) {
-                    if (path1.node !== path2.node) {
-                        const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
-                        const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
-                        if (path1.node.loc && path2.node.loc) {
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-                        }
-                    }
-                }
-            });
-        }
-    });
-    traverse_1.default(ast, {
-        VariableDeclaration(path1) {
-            traverse_1.default(ast, {
-                VariableDeclaration(path2) {
-                    if (path1.node !== path2.node) {
-                        const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
-                        const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
-                        if (path1.node.loc && path2.node.loc) {
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-                        }
-                    }
-                }
-            });
-        }
-    });
->>>>>>> 675be4bdc18ad440b7647d7cd55b65bd75774b0d
     // traverse(ast, {
     //     BlockStatement(path1) {
     //         traverse(ast, {
@@ -157,7 +98,7 @@ function detectClone(code, code2) {
     return generator_1.default(ast).code;
 }
 exports.detectClone = detectClone;
-function compareAst(ast1, ast2, loc1, loc2) {
+function compareAst(ast1, ast2, loc1, loc2, secondURI) {
     traverse_1.default(ast1, {
         Identifier(path) {
             path.node.name = "a";
@@ -175,25 +116,17 @@ function compareAst(ast1, ast2, loc1, loc2) {
         firstInstanceEnd.push(loc1 ? { line: loc1.end.line, column: loc1.end.column } : { line: 0, column: 0 });
         repInstanceSt.push(loc2 ? { line: loc2.start.line, column: loc2.start.column } : { line: 0, column: 0 });
         repInstanceEnd.push(loc2 ? { line: loc2.end.line, column: loc2.end.column } : { line: 0, column: 0 });
+        uriSecond.push(secondURI);
         // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
-<<<<<<< HEAD
         vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line : ""}:${loc1 ? loc1.end.line : ""} and ${loc2 ? loc2.start.line : ""}:${loc2 ? loc2.end.line : ""}`);
-=======
-        vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line : ""}:${loc1 ? loc1.start.column : ""} and ${loc2 ? loc2.start.line : ""}:${loc2 ? loc2.start.column : ""}`);
->>>>>>> 675be4bdc18ad440b7647d7cd55b65bd75774b0d
     }
 }
 function updateDiags(document, collection) {
     let diagnostics = [];
     firstInstanceSt.forEach((instance, index) => {
-<<<<<<< HEAD
-        diag1 = new vscode.Diagnostic(new vscode.Range(new vscode.Position(instance.line, instance.column), new vscode.Position(firstInstanceEnd[index].line, firstInstanceEnd[index].column)), 'WET Code detected!', vscode.DiagnosticSeverity.Warning);
-        diag1.source = 'dryco';
-=======
         let diag1 = new vscode.Diagnostic(new vscode.Range(new vscode.Position(instance.line, instance.column), new vscode.Position(firstInstanceEnd[index].line, firstInstanceEnd[index].column)), 'WET Code detected!', vscode.DiagnosticSeverity.Warning);
         diag1.source = 'DryCo';
->>>>>>> e9e4f4db0bb86adde9c7cf616635d19c8a67d7be
-        diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(new vscode.Position(repInstanceSt[index].line, repInstanceSt[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
+        diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(vscode.Uri.file(uriSecond[index]), new vscode.Range(new vscode.Position(repInstanceSt[index].line, repInstanceSt[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
         diag1.code = 102;
         diagnostics.push(diag1);
         if (document && Path.basename(document.uri.fsPath)) {
@@ -202,7 +135,7 @@ function updateDiags(document, collection) {
         else {
             collection.clear();
         }
-        // console.log(diag1);
+        console.log(vscode.Uri.file(uriSecond[index]));
     });
 }
 exports.updateDiags = updateDiags;

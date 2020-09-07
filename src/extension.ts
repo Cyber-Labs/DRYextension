@@ -23,7 +23,6 @@ export function activate(context: vscode.ExtensionContext) {
 			const code = readCode();
 
 			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-
 			if(currPath){
 				var pathArray = currPath.split("\\");
 				pathArray.pop();
@@ -33,7 +32,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 						fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
 							if (err) {throw err;}
-							const transformedCode = detectClone(code, data);
+							const transformedCode = detectClone(code, data, `${currPath}\\${file}` );
 						  });
 
 					});

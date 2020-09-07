@@ -11,6 +11,7 @@ var firstInstanceSt:{line:number,column:number}[] = [];
 var firstInstanceEnd:{line:number,column:number}[] = [];
 var repInstanceSt:{line:number,column:number}[] = [];
 var repInstanceEnd:{line:number,column:number}[] = [];
+var uriSecond:string[] = [];
 
 // Convert Normal function to Arrow function
 export function transformToArrow(code: string): string {
@@ -36,7 +37,7 @@ function toArrowFunction(node: t.FunctionDeclaration): t.VariableDeclaration {
 }
 
 // detect clone
-export function detectClone(code: string, code2: string): string {
+export function detectClone(code: string, code2: string, secondURI: string): string {
 
     const ast = parse(code);
     const ast2 = parse(code2);
@@ -44,11 +45,11 @@ export function detectClone(code: string, code2: string): string {
         FunctionDeclaration(path1) {
             traverse(ast2, {
                 FunctionDeclaration(path2){
-                    if(path1.node!==path2.node){
+                    if(path1.node!=path2.node){
                         const ast1 = parse((generate(parse(path1.toString()))).code);
                         const ast2 = parse((generate(parse(path2.toString()))).code);
                         if(path1.node.loc && path2.node.loc){
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
+                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc, secondURI);
                         }
                     }
                 }
@@ -106,7 +107,7 @@ export function detectClone(code: string, code2: string): string {
     return generate(ast).code;
 }
 
-function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.SourceLocation): void {
+function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.SourceLocation, secondURI:string): void {
     traverse(ast1, {
         Identifier(path) {
             path.node.name = "a";
@@ -124,6 +125,7 @@ function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.
         firstInstanceEnd.push(loc1 ? {line : loc1.end.line,column : loc1.end.column}:{line:0,column:0});
         repInstanceSt.push(loc2 ? {line : loc2.start.line,column : loc2.start.column}:{line:0,column:0});
         repInstanceEnd.push(loc2 ? {line : loc2.end.line,column : loc2.end.column}:{line:0,column:0});
+        uriSecond.push(secondURI);
         // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
         vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line:""}:${loc1 ? loc1.end.line:""} and ${loc2 ? loc2.start.line:""}:${loc2 ? loc2.end.line:""}`);
     }
@@ -141,9 +143,8 @@ export function updateDiags(document: vscode.TextDocument,
                 vscode.DiagnosticSeverity.Warning,
             );
             diag1.source = 'DryCo';
-
             diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(
-                new vscode.Location(document.uri,
+                new vscode.Location(vscode.Uri.file(uriSecond[index]),
                     new vscode.Range( new vscode.Position(repInstanceSt[index].line,repInstanceSt[index].column),  new vscode.Position(repInstanceEnd[index].line,repInstanceEnd[index].column))),
                 'Similar Code here')];
             diag1.code = 102;
@@ -153,7 +154,7 @@ export function updateDiags(document: vscode.TextDocument,
             } else {
                 collection.clear();
             }
-            // console.log(diag1);
+            console.log(vscode.Uri.file(uriSecond[index]));
         });
 }
 
