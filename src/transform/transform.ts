@@ -39,7 +39,7 @@ function toArrowFunction(node: t.FunctionDeclaration): t.VariableDeclaration {
 export function detectClone(code: string, code2: string): string {
 
     const ast = parse(code);
-    const ast2 = parse(code2)
+    const ast2 = parse(code2);
     traverse(ast, {
         FunctionDeclaration(path1) {
             traverse(ast2, {

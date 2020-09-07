@@ -30,14 +30,11 @@ export function activate(context: vscode.ExtensionContext) {
 				currPath = pathArray.join('\\');
 				fs.readdir(currPath, (err, files: string[]) => {
 					files.forEach((file) => {
-						const uri = vscode.Uri.file(file);
-						var code2;
 
 						fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
 							if (err) {throw err;}
 							const transformedCode = detectClone(code, data);
 						  });
-
 
 					});
 				});
