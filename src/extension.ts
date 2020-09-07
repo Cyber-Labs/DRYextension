@@ -21,7 +21,6 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('dryco.detectClone', () => {
 
 			const code = readCode();
-<<<<<<< HEAD
 
 			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
 
@@ -55,20 +54,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 			
 			// write(transformedCode);
-=======
-			const transformedCode = detectClone(code);
-			const diagColl = vscode.languages.createDiagnosticCollection('dryco');
-			if (vscode.window.activeTextEditor) {
-				updateDiags(vscode.window.activeTextEditor.document, diagColl);
-			}
-			context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
-				(e: vscode.TextEditor | undefined) => {
-					if (e !== undefined) {
-						updateDiags(e.document, diagColl);
-					}
-				}));
-			write(transformedCode);
->>>>>>> 675be4bdc18ad440b7647d7cd55b65bd75774b0d
 	
 		})
 	);
