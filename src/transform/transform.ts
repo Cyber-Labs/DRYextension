@@ -154,17 +154,32 @@ export function updateDiags(document: vscode.TextDocument,
             } else {
                 collection.clear();
             }
-            console.log(vscode.Uri.file(uriSecond[index]));
+            vscode.languages.registerCodeActionsProvider('javascript', {
+                provideCodeActions(document) {
+                    var action = new vscode.CodeAction("Refactor repeated code",vscode.CodeActionKind.QuickFix);
+                    action.diagnostics = diagnostics;
+                    action.edit=new vscode.WorkspaceEdit();
+                    const wsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : ""; // gets the path of the first workspace folder
+                    const filePath = vscode.Uri.file(wsPath + '/dryco/utilFunctions.js');
+                    vscode.window.showInformationMessage(filePath.toString());
+                    action.edit.createFile(filePath, { ignoreIfExists: true });
+                    const wholeDocument = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(document.lineCount, 0));
+                    const updateCode = new vscode.TextEdit(wholeDocument, "// Hi from dryco :0");
+                    action.edit.set(vscode.Uri.file(filePath.toString()), [updateCode]);
+                    vscode.workspace.applyEdit(action.edit);
+                    vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js');
+                    return [action];
+                }
+            });
         });
 }
 
-// const diag_coll = vscode.languages.createDiagnosticCollection('basic-lint-1');
-//     if (vscode.window.activeTextEditor) {
-//         diag.updateDiags(vscode.window.activeTextEditor.document, diag_coll);
-//     }
-//     context.subscriptions.push(vscode.window.onDidChangeActiveTextEditor(
-//         (e: vscode.TextEditor | undefined) => {
-//             if (e !== undefined) {
-//                 diag.updateDiags(e.document, diag_coll);
-//             }
-//         }));
+function activate():void{
+    const wsedit = new vscode.WorkspaceEdit();
+    const wsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : ""; // gets the path of the first workspace folder
+    const filePath = vscode.Uri.file(wsPath + '/hello/world.md');
+    vscode.window.showInformationMessage(filePath.toString());
+    wsedit.createFile(filePath, { ignoreIfExists: true });
+    vscode.workspace.applyEdit(wsedit);
+    vscode.window.showInformationMessage('Created a new file: hello/world.md');
+}
