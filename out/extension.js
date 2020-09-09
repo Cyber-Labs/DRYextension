@@ -23,12 +23,21 @@ function activate(context) {
             currPath = pathArray.join('\\');
             fs.readdir(currPath, (err, files) => {
                 files.forEach((file) => {
+<<<<<<< HEAD
                     const uri = vscode.Uri.file(`${currPath}\\${file}`);
                     console.log(uri);
                     // fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
                     // 	if (err) {throw err;}
                     // 	const transformedCode = detectClone(code, data);
                     //   });
+=======
+                    fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+                        if (err) {
+                            throw err;
+                        }
+                        const transformedCode = transform_1.detectClone(code, data, `${currPath}\\${file}`);
+                    });
+>>>>>>> d9b2c0ebadb8bff69811d5127c4d3957d5c10d8b
                 });
             });
         }

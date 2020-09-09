@@ -23,20 +23,17 @@ export function activate(context: vscode.ExtensionContext) {
 			const code = readCode();
 
 			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-			console.log(vscode.window.activeTextEditor?.document.uri);
-
 			if(currPath){
 				var pathArray = currPath.split("\\");
 				pathArray.pop();
 				currPath = pathArray.join('\\');
 				fs.readdir(currPath, (err, files: string[]) => {
 					files.forEach((file) => {
-						const uri = vscode.Uri.file(`${currPath}\\${file}`);
-						console.log(uri);
-						// fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
-						// 	if (err) {throw err;}
-						// 	const transformedCode = detectClone(code, data);
-						//   });
+
+						fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+							if (err) {throw err;}
+							const transformedCode = detectClone(code, data, `${currPath}\\${file}` );
+						  });
 
 					});
 				});
