@@ -13,43 +13,30 @@ function activate(context) {
     });
     context.subscriptions.push(disposable);
     context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
-        var _a;
+        var _a, _b;
         const code = readCode();
-<<<<<<< HEAD
         var currPath = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
+        console.log((_b = vscode.window.activeTextEditor) === null || _b === void 0 ? void 0 : _b.document.uri);
         if (currPath) {
             var pathArray = currPath.split("\\");
             pathArray.pop();
             currPath = pathArray.join('\\');
             fs.readdir(currPath, (err, files) => {
                 files.forEach((file) => {
-                    const uri = vscode.Uri.file(file);
-                    var code2;
-                    fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
-                        if (err) {
-                            throw err;
-                        }
-                        const transformedCode = transform_1.detectClone(code, data);
-                    });
+                    const uri = vscode.Uri.file(`${currPath}\\${file}`);
+                    console.log(uri);
+                    // fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+                    // 	if (err) {throw err;}
+                    // 	const transformedCode = detectClone(code, data);
+                    //   });
                 });
             });
         }
-=======
-        const transformedCode = transform_1.detectClone(code);
-<<<<<<< HEAD
-        const diagColl = vscode.languages.createDiagnosticCollection('dryco');
-=======
->>>>>>> 675be4bdc18ad440b7647d7cd55b65bd75774b0d
         const editor = vscode.window.activeTextEditor;
         if (!editor) {
             throw new Error("No active editor");
         }
-<<<<<<< HEAD
         const diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
-=======
-        const diagColl = vscode.languages.createDiagnosticCollection(`Dryo ${editor}`);
->>>>>>> e9e4f4db0bb86adde9c7cf616635d19c8a67d7be
->>>>>>> 675be4bdc18ad440b7647d7cd55b65bd75774b0d
         if (vscode.window.activeTextEditor) {
             transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
