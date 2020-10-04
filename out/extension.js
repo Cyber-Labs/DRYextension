@@ -43,6 +43,10 @@ function activate(context) {
         if (vscode.window.activeTextEditor) {
             transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
+        const diag = vscode.window.onDidChangeActiveTextEditor;
+        if (diag && vscode.window.activeTextEditor) {
+            transform_1.updateDiags(vscode.window.activeTextEditor.document, vscode.languages.createDiagnosticCollection(`Dryco ${vscode.window.activeTextEditor}`));
+        }
     }));
 }
 exports.activate = activate;
