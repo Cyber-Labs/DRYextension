@@ -13,6 +13,7 @@ var firstInstanceEnd = [];
 var repInstanceSt = [];
 var repInstanceEnd = [];
 var uriSecond = [];
+var Nodes = [];
 // Convert Normal function to Arrow function
 function transformToArrow(code) {
     const ast = parser_1.parse(code);
@@ -43,7 +44,6 @@ function detectClone(code, code2, secondURI) {
                         const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
                         const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
                         if (path1.node.loc && path2.node.loc) {
-                            console.log(path1.container);
                             compareAst(ast1, ast2, path1.node.loc, path2.node.loc, secondURI);
                         }
                     }
@@ -100,6 +100,7 @@ function detectClone(code, code2, secondURI) {
 }
 exports.detectClone = detectClone;
 function compareAst(ast1, ast2, loc1, loc2, secondURI) {
+    const originalNode = ast1;
     traverse_1.default(ast1, {
         Identifier(path) {
             path.node.name = "a";
@@ -113,6 +114,7 @@ function compareAst(ast1, ast2, loc1, loc2, secondURI) {
     // console.log(generate(ast1).code === generate(ast2).code);
     // console.log(path1.node.loc?.start)
     if (generator_1.default(ast1).code === generator_1.default(ast2).code) {
+        Nodes.push(originalNode);
         firstInstanceSt.push(loc1 ? { line: loc1.start.line, column: loc1.start.column } : { line: 0, column: 0 });
         firstInstanceEnd.push(loc1 ? { line: loc1.end.line, column: loc1.end.column } : { line: 0, column: 0 });
         repInstanceSt.push(loc2 ? { line: loc2.start.line, column: loc2.start.column } : { line: 0, column: 0 });
@@ -130,53 +132,57 @@ function updateDiags(document, collection) {
         diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(vscode.Uri.file(uriSecond[index]), new vscode.Range(new vscode.Position(repInstanceSt[index].line, repInstanceSt[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
         diag1.code = 102;
         diagnostics.push(diag1);
-        if (document && Path.basename(document.uri.fsPath)) {
-            collection.clear();
-            collection.set(document.uri, diagnostics);
-        }
-        else {
-            collection.clear();
-        }
         vscode.languages.registerCodeActionsProvider('javascript', {
             provideCodeActions(document) {
-                var action = new vscode.CodeAction("Refactor repeated code", vscode.CodeActionKind.QuickFix);
-                action.diagnostics = diagnostics;
-                vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js 1');
+                var action = new vscode.CodeAction("Refactor repeated code", vscode.CodeActionKind.Refactor);
+                action.diagnostics = [diag1];
                 action.edit = new vscode.WorkspaceEdit();
-                vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js 2');
                 const wsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : ""; // gets the path of the first workspace folder
-                console.log(wsPath);
                 const filePath = vscode.Uri.file(wsPath + '/dryco/utilFunctions.js');
-                vscode.window.showInformationMessage(filePath.toString());
                 action.edit.createFile(filePath, { ignoreIfExists: true });
-                vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js');
+                vscode.window.showInformationMessage('Code transferred to dryco/utilFunctions.js');
                 const wholeDocument = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(100000, 0));
-                vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js');
-                const updatedCode = activate(filePath.toString(), 1);
-                vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js');
-                console.log(updatedCode);
-                const updateCode = new vscode.TextEdit(wholeDocument, updatedCode ? updatedCode : "hello ");
-                // console.log(vscode.Uri.file(filePath.toString()));
+                const exportedNode = activate(filePath.toString(), index);
+                const updatedCode = generator_1.default(exportedNode).code;
+                const updateCode = new vscode.TextEdit(wholeDocument, updatedCode);
                 action.edit.set(filePath, [updateCode]);
                 vscode.workspace.applyEdit(action.edit);
-                vscode.window.showInformationMessage('Created a new file: dryco/utilityFunctions.js 5');
                 return [action];
             }
         });
     });
+    if (document && Path.basename(document.uri.fsPath)) {
+        collection.clear();
+        collection.set(document.uri, diagnostics);
+    }
+    else {
+        collection.clear();
+    }
 }
 exports.updateDiags = updateDiags;
 function activate(filePath, index) {
+    const repeatedNode = Nodes[index];
+    var convertedToFunctionNode;
+    traverse_1.default(repeatedNode, {
+        FunctionDeclaration(path) {
+            convertedToFunctionNode = toArrowFunction(path.node);
+        }
+    });
+    var exportNode = t.exportNamedDeclaration(convertedToFunctionNode);
+    console.log(exportNode);
+    return exportNode;
     // const wsedit = new vscode.WorkspaceEdit();
     // const wsPath = document.uri.fsPath;
-    console.log('hi');
-    const repeatedCodeRange = new vscode.Range(new vscode.Position(firstInstanceSt[index].line, firstInstanceSt[index].column), new vscode.Position(firstInstanceEnd[index].line, firstInstanceEnd[index].column));
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        throw new Error("No active editor");
-    }
-    const repeatedCode = editor.document.getText(repeatedCodeRange);
-    return repeatedCode;
+    // console.log('hi');
+    // const repeatedCodeRange = new vscode.Range(
+    // 	new vscode.Position(firstInstanceSt[index].line,firstInstanceSt[index].column),  new vscode.Position(firstInstanceEnd[index].line,firstInstanceEnd[index].column)
+    // );
+    // const editor = vscode.window.activeTextEditor;
+    // if(!editor) {
+    // 	throw new Error("No active editor");
+    // }
+    // const repeatedCode =  editor.document.getText(repeatedCodeRange);
+    // return repeatedCode;
     // let transformedCode;
     // const ast = parse(repeatedCode);
     // traverse(ast, {

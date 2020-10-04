@@ -50,6 +50,10 @@ export function activate(context: vscode.ExtensionContext) {
 			if (vscode.window.activeTextEditor) {
 				updateDiags(vscode.window.activeTextEditor.document, diagColl);
 			}
+			const diag = vscode.window.onDidChangeActiveTextEditor;
+			if (diag && vscode.window.activeTextEditor) {
+				updateDiags(vscode.window.activeTextEditor.document, vscode.languages.createDiagnosticCollection(`Dryco ${vscode.window.activeTextEditor}`));
+			}
 
 
 	
