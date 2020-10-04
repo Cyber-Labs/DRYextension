@@ -4,7 +4,7 @@ Dryco is an vscode extension which allows a new to programming user to write the
 
 ## Features
 
-Dryco make your code more DRY(don't repeat yourself), reliable and readable by shifting all reapeated blocks of code into one file and importing them in our targel file and using them, this save us lots of size.
+Dryco makes your code more DRY(don't repeat yourself), reliable and readable by shifting all reapeated blocks of code into one file and importing them in our targel file and using them, this save us lots of size.
 
 <!-- For example if there is an image subfolder under your extension project workspace:
 
@@ -12,13 +12,13 @@ Dryco make your code more DRY(don't repeat yourself), reliable and readable by s
 
 > Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow. -->
 
-## Requirements
+<!-- ## Requirements
 To install all npm dependencies and packages, run thin command on console:
-> npm install
+> npm install -->
 
 ## Running Extension
 
-After cloning this repo, open it in VSCode install all npm dependencies or packages by running this command on console:
+After cloning this repo, open it in VSCode and install all npm dependencies or packages by running this command on console:
 > npm install
 
 After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `enter key`.
@@ -29,7 +29,7 @@ To run extension press `CTRL+SHIFT+P` and type `Detect Clone`, this command will
 
 On hovering your courser above the highlighted code, it will tell user the locations of repeated code blocks(i.e. line number and file name).
 
-On hovering your courser above the highlighted code, user also encounters `quick fix` option which on clicking creates a folder in the root directory of current project and move all repeated blocks of code in current file to the `utilFunctions.js` file in it and then exporting it from there.
+On hovering your courser above the highlighted code, user also encounters `quick fix` option which on clicking creates a folder `dryco`(folder name) in the root directory of current project and move all repeated blocks of code in current file to the `utilFunctions.js` file in `dryco` folder and then exporting it from there.
 
 <!-- ## Known Issues
 
@@ -44,4 +44,4 @@ Currently there is only one feature -->
 Initial release of dryco
 
 -----------------------------------------------------------------------------------------------------------
-**Enjoy!**
+**Happy Hacking!**
