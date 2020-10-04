@@ -39,15 +39,11 @@ function detectClone(code, code2, secondURI) {
         FunctionDeclaration(path1) {
             traverse_1.default(ast2, {
                 FunctionDeclaration(path2) {
-                    if (path1.node != path2.node) {
+                    if (path1.node !== path2.node) {
                         const ast1 = parser_1.parse((generator_1.default(parser_1.parse(path1.toString()))).code);
                         const ast2 = parser_1.parse((generator_1.default(parser_1.parse(path2.toString()))).code);
                         if (path1.node.loc && path2.node.loc) {
-<<<<<<< HEAD
-                            compareAst(ast1, ast2, path1.node.loc, path2.node.loc);
-=======
                             compareAst(ast1, ast2, path1.node.loc, path2.node.loc, secondURI);
->>>>>>> d9b2c0ebadb8bff69811d5127c4d3957d5c10d8b
                         }
                     }
                 }
@@ -130,11 +126,7 @@ function updateDiags(document, collection) {
     firstInstanceSt.forEach((instance, index) => {
         let diag1 = new vscode.Diagnostic(new vscode.Range(new vscode.Position(instance.line, instance.column), new vscode.Position(firstInstanceEnd[index].line, firstInstanceEnd[index].column)), 'WET Code detected!', vscode.DiagnosticSeverity.Warning);
         diag1.source = 'DryCo';
-<<<<<<< HEAD
-        diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(document.uri, new vscode.Range(new vscode.Position(repInstanceSt[index].line, repInstanceSt[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
-=======
         diag1.relatedInformation = [new vscode.DiagnosticRelatedInformation(new vscode.Location(vscode.Uri.file(uriSecond[index]), new vscode.Range(new vscode.Position(repInstanceSt[index].line, repInstanceSt[index].column), new vscode.Position(repInstanceEnd[index].line, repInstanceEnd[index].column))), 'Similar Code here')];
->>>>>>> d9b2c0ebadb8bff69811d5127c4d3957d5c10d8b
         diag1.code = 102;
         diagnostics.push(diag1);
         if (document && Path.basename(document.uri.fsPath)) {
@@ -149,6 +141,7 @@ function updateDiags(document, collection) {
                 action.diagnostics = diagnostics;
                 action.edit = new vscode.WorkspaceEdit();
                 const wsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : ""; // gets the path of the first workspace folder
+                console.log(wsPath);
                 const filePath = vscode.Uri.file(wsPath + '/dryco/utilFunctions.js');
                 vscode.window.showInformationMessage(filePath.toString());
                 action.edit.createFile(filePath, { ignoreIfExists: true });

@@ -1,65 +1,47 @@
-# dryco README
+# dryco
 
-This is the README for your extension "dryco". After writing up a brief description, we recommend including the following sections.
+Dryco is an vscode extension which allows a new to programming user to write their code like a pro.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+Dryco make your code more DRY(don't repeat yourself), reliable and readable by shifting all reapeated blocks of code into one file and importing them in our targel file and using them, this save us lots of size.
 
-For example if there is an image subfolder under your extension project workspace:
+<!-- For example if there is an image subfolder under your extension project workspace:
 
 \!\[feature X\]\(images/feature-x.png\)
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow. -->
 
 ## Requirements
+To install all npm dependencies and packages, run thin command on console:
+> npm install
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+## Running Extension
 
-## Extension Settings
+After cloning this repo, open it in VSCode install all npm dependencies or packages by running this command on console:
+> npm install
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `enter key`.
 
-For example:
+Above actions will open an extention development environment and can be used to test all features of this extention.
 
-This extension contributes the following settings:
+To run extension press `CTRL+SHIFT+P` and type `Detect Clone`, this command will detect repeated blocks of code and represent it by underlining(in yellow color).
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+On hovering your courser above the highlighted code, it will tell user the locations of repeated code blocks(i.e. line number and file name).
 
-## Known Issues
+On hovering your courser above the highlighted code, user also encounters `quick fix` option which on clicking creates a folder in the root directory of current project and move all repeated blocks of code in current file to the `utilFunctions.js` file in it and then exporting it from there.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+<!-- ## Known Issues
 
-## Release Notes
+Calling out known issues can help limit users opening duplicate issues against your extension. -->
 
-Users appreciate release notes as you update your extension.
+<!-- ## Release Notes
+
+Currently there is only one feature -->
 
 ### 1.0.0
 
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
+Initial release of dryco
 
 -----------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
 **Enjoy!**

@@ -160,6 +160,7 @@ export function updateDiags(document: vscode.TextDocument,
                     action.diagnostics = diagnostics;
                     action.edit=new vscode.WorkspaceEdit();
                     const wsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : ""; // gets the path of the first workspace folder
+                    console.log(wsPath);
                     const filePath = vscode.Uri.file(wsPath + '/dryco/utilFunctions.js');
                     vscode.window.showInformationMessage(filePath.toString());
                     action.edit.createFile(filePath, { ignoreIfExists: true });

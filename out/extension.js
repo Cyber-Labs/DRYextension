@@ -13,31 +13,25 @@ function activate(context) {
     });
     context.subscriptions.push(disposable);
     context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
-        var _a, _b;
+        var _a;
         const code = readCode();
+        let transformedCode;
         var currPath = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
-        console.log((_b = vscode.window.activeTextEditor) === null || _b === void 0 ? void 0 : _b.document.uri);
         if (currPath) {
             var pathArray = currPath.split("\\");
             pathArray.pop();
             currPath = pathArray.join('\\');
             fs.readdir(currPath, (err, files) => {
                 files.forEach((file) => {
-<<<<<<< HEAD
-                    const uri = vscode.Uri.file(`${currPath}\\${file}`);
-                    console.log(uri);
-                    // fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
-                    // 	if (err) {throw err;}
-                    // 	const transformedCode = detectClone(code, data);
-                    //   });
-=======
                     fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
                         if (err) {
                             throw err;
                         }
-                        const transformedCode = transform_1.detectClone(code, data, `${currPath}\\${file}`);
+                        transformedCode = transform_1.detectClone(code, data, `${currPath}\\${file}`);
+                        if (transformedCode) {
+                            write(transformedCode);
+                        }
                     });
->>>>>>> d9b2c0ebadb8bff69811d5127c4d3957d5c10d8b
                 });
             });
         }
@@ -49,7 +43,6 @@ function activate(context) {
         if (vscode.window.activeTextEditor) {
             transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
-        // write(transformedCode);
     }));
 }
 exports.activate = activate;

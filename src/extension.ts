@@ -21,6 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.commands.registerCommand('dryco.detectClone', () => {
 
 			const code = readCode();
+			let transformedCode;
 
 			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
 			if(currPath){
@@ -32,15 +33,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 						fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
 							if (err) {throw err;}
-							const transformedCode = detectClone(code, data, `${currPath}\\${file}` );
+							transformedCode = detectClone(code, data, `${currPath}\\${file}` );
+							if(transformedCode){
+								write(transformedCode);
+							}
 						  });
-
 					});
 				});
 			}
-
-
-
 
 			const editor = vscode.window.activeTextEditor;
 			if(!editor) {
@@ -51,8 +51,7 @@ export function activate(context: vscode.ExtensionContext) {
 				updateDiags(vscode.window.activeTextEditor.document, diagColl);
 			}
 
-			
-			// write(transformedCode);
+
 	
 		})
 	);
