@@ -100,7 +100,8 @@ function detectClone(code, code2, secondURI) {
 }
 exports.detectClone = detectClone;
 function compareAst(ast1, ast2, loc1, loc2, secondURI) {
-    const originalNode = ast1;
+    const originalNode = parser_1.parse(generator_1.default(ast1).code);
+    console.log(originalNode);
     traverse_1.default(ast1, {
         Identifier(path) {
             path.node.name = "a";

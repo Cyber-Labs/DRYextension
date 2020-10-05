@@ -110,7 +110,8 @@ export function detectClone(code: string, code2: string, secondURI: string): str
 }
 
 function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.SourceLocation, secondURI:string): void {
-    const originalNode = ast1;
+    const originalNode = parse(generate(ast1).code);
+    console.log(originalNode);
     traverse(ast1, {
         Identifier(path) {
             path.node.name = "a";
@@ -190,7 +191,7 @@ function activate(filePath:string, index:number):t.ExportNamedDeclaration{
         FunctionDeclaration(path) {
             convertedToFunctionNode = toArrowFunction(path.node);
         }
-    })
+    });
     var exportNode = t.exportNamedDeclaration(convertedToFunctionNode);
     console.log(exportNode);
     return exportNode;
