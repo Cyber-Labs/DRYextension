@@ -18,16 +18,17 @@ function activate(context) {
         let transformedCode;
         var currPath = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
         if (currPath) {
-            var pathArray = currPath.split("\\");
+            var pathArray = currPath.split("/");
             pathArray.pop();
-            currPath = pathArray.join('\\');
+            currPath = pathArray.join('/');
             fs.readdir(currPath, (err, files) => {
                 files.forEach((file) => {
-                    fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+                    fs.readFile(`${currPath}/${file}`, (err, data) => {
                         if (err) {
                             throw err;
                         }
-                        transformedCode = transform_1.detectClone(code, data, `${currPath}\\${file}`);
+                        console.log(data);
+                        transformedCode = transform_1.detectClone(code, data.toString(), `${currPath}/${file}`);
                         if (transformedCode) {
                             write(transformedCode);
                         }

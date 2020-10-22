@@ -25,15 +25,16 @@ export function activate(context: vscode.ExtensionContext) {
 
 			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
 			if(currPath){
-				var pathArray = currPath.split("\\");
+				var pathArray = currPath.split("/");
 				pathArray.pop();
-				currPath = pathArray.join('\\');
+				currPath = pathArray.join('/');
 				fs.readdir(currPath, (err, files: string[]) => {
 					files.forEach((file) => {
 
-						fs.readFile(`${currPath}\\${file}`, 'utf8', (err, data) => {
+						fs.readFile(`${currPath}/${file}`, (err, data) => {
 							if (err) {throw err;}
-							transformedCode = detectClone(code, data, `${currPath}\\${file}` );
+							console.log(data);
+							transformedCode = detectClone(code, data.toString(), `${currPath}/${file}` );
 							if(transformedCode){
 								write(transformedCode);
 							}
