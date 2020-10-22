@@ -25,22 +25,47 @@ export function activate(context: vscode.ExtensionContext) {
 
 			var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
 			if(currPath){
-				var pathArray = currPath.split("/");
-				pathArray.pop();
-				currPath = pathArray.join('/');
-				fs.readdir(currPath, (err, files: string[]) => {
-					files.forEach((file) => {
-
-						fs.readFile(`${currPath}/${file}`, (err, data) => {
-							if (err) {throw err;}
-							console.log(data);
-							transformedCode = detectClone(code, data.toString(), `${currPath}/${file}` );
-							if(transformedCode){
-								write(transformedCode);
-							}
-						  });
+				// if (navigator.userAgent.match(/Windows/i)){
+				// 	console.log(navigator.userAgent.match(/Windows/i));
+				// }
+				var os = require('os');
+				console.log(os.platform());
+				if(os.platform() === 'linux'){
+					var pathArray = currPath.split("/");
+					pathArray.pop();
+					currPath = pathArray.join('/');
+					fs.readdir(currPath, (err, files: string[]) => {
+						files.forEach((file) => {
+	
+							fs.readFile(`${currPath}/${file}`, (err, data) => {
+								if (err) {throw err;}
+								console.log(data);
+								transformedCode = detectClone(code, data.toString(), `${currPath}/${file}` );
+								if(transformedCode){
+									write(transformedCode);
+								}
+							  });
+						});
 					});
-				});
+				} else {
+					var pathArray = currPath.split("\\");
+					pathArray.pop();
+					currPath = pathArray.join('\\');
+					fs.readdir(currPath, (err, files: string[]) => {
+						files.forEach((file) => {
+
+							fs.readFile(`${currPath}\\${file}`, (err, data) => {
+								if (err) {throw err;}
+								console.log(data);
+								transformedCode = detectClone(code, data.toString(), `${currPath}\\${file}` );
+								if(transformedCode){
+									write(transformedCode);
+								}
+							});
+						});
+					});
+				}
+				
 			}
 
 			const editor = vscode.window.activeTextEditor;
