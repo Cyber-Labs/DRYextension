@@ -19,7 +19,11 @@ To install all npm dependencies and packages, run thin command on console:
 ## Running Extension
 
 After cloning this repo, open it in VSCode and install all npm dependencies or packages by running these commands on console:
+
+
 > npm install
+
+
 > npm run console
 
 After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `enter key`.
