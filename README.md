@@ -4,7 +4,7 @@ Dryco is an vscode extension which allows a new to programming user to write the
 
 ## Features
 
-Dryco makes your code more DRY(don't repeat yourself), reliable and readable by shifting all reapeated blocks of code into one file and importing them in our targel file and using them, this save us lots of size.
+Dryco makes your code more DRY(Don't Repeat Yourself), reliable and readable by shifting all reapeated blocks of code into one file and importing them in our targel file and using them, this save us lots of size.
 
 <!-- For example if there is an image subfolder under your extension project workspace:
 
@@ -24,7 +24,8 @@ After cloning this repo, open it in VSCode and install all npm dependencies or p
 > npm install
 
 
-> npm run console
+> npm run compile
+
 
 After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `Enter key`.
 
