@@ -23,8 +23,7 @@ After cloning this repo, open it in VSCode and install all npm dependencies or p
 
 > npm install
 
-
-> npm run console
+> npm run compile
 
 After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `enter key`.
 
