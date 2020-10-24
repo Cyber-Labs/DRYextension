@@ -37,10 +37,6 @@ On hovering your courser above the highlighted code, it will tell user the locat
 
 On hovering your courser above the highlighted code, user also encounters `quick fix` option which on clicking creates a folder `dryco`(folder name) in the root directory of current project and move all repeated blocks of code in current file to the `utilFunctions.js` file in `dryco` folder and then exporting it from there.
 
-<!-- ## Known Issues
-
-Calling out known issues can help limit users opening duplicate issues against your extension. -->
-
 <!-- ## Release Notes
 
 Currently there is only one feature -->
