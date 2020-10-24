@@ -26,7 +26,7 @@ After cloning this repo, open it in VSCode and install all npm dependencies or p
 
 > npm run console
 
-After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `enter key`.
+After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `Enter key`.
 
 Above actions will open an extention development environment and can be used to test all features of this extention.
 
