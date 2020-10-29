@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
-import {transformToArrow, detectClone, updateDiags} from './transform/transform';
+import {transformToArrow, detectClone} from './transform/transform';
+import { updateDiags } from "./transform/updateDiags";
 import * as fs from 'fs';
 
 
@@ -69,6 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 
 			const editor = vscode.window.activeTextEditor;
+			const drycoDiagnostics = vscode.languages.createDiagnosticCollection('Dryco');
 			if(!editor) {
 				throw new Error("No active editor");
 			}
@@ -78,11 +80,11 @@ export function activate(context: vscode.ExtensionContext) {
 			}
 			const diag = vscode.window.onDidChangeActiveTextEditor;
 			if (diag && vscode.window.activeTextEditor) {
-				updateDiags(vscode.window.activeTextEditor.document, vscode.languages.createDiagnosticCollection(`Dryco ${vscode.window.activeTextEditor}`));
+				updateDiags(vscode.window.activeTextEditor.document, drycoDiagnostics);
 			}
 
-
-	
+			vscode.workspace.onDidChangeTextDocument(e => updateDiags(e.document, drycoDiagnostics))
+			vscode.workspace.onDidCloseTextDocument(doc => drycoDiagnostics.delete(doc.uri))
 		})
 	);
 
