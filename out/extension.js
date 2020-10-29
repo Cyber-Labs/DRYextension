@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
 const vscode = require("vscode");
 const transform_1 = require("./transform/transform");
+const updateDiags_1 = require("./transform/updateDiags");
 const fs = require("fs");
 function activate(context) {
     console.log('Congratulations, your extension "dryco" is now active!');
@@ -63,17 +64,20 @@ function activate(context) {
             }
         }
         const editor = vscode.window.activeTextEditor;
+        const drycoDiagnostics = vscode.languages.createDiagnosticCollection('Dryco');
         if (!editor) {
             throw new Error("No active editor");
         }
         const diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
         if (vscode.window.activeTextEditor) {
-            transform_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
+            updateDiags_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
         const diag = vscode.window.onDidChangeActiveTextEditor;
         if (diag && vscode.window.activeTextEditor) {
-            transform_1.updateDiags(vscode.window.activeTextEditor.document, vscode.languages.createDiagnosticCollection(`Dryco ${vscode.window.activeTextEditor}`));
+            updateDiags_1.updateDiags(vscode.window.activeTextEditor.document, drycoDiagnostics);
         }
+        vscode.workspace.onDidChangeTextDocument(e => updateDiags_1.updateDiags(e.document, drycoDiagnostics));
+        vscode.workspace.onDidCloseTextDocument(doc => drycoDiagnostics.delete(doc.uri));
     }));
 }
 exports.activate = activate;
