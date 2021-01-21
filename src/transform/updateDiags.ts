@@ -23,7 +23,7 @@ export function updateDiags(document: vscode.TextDocument,
             'Similar Code here')];
         diagnostics.push(diag1);
     });
-    registerModifiers(diagnostics);
+    // registerModifiers(diagnostics);
     if (document && Path.basename(document.uri.fsPath)) {
         collection.clear();
         collection.set(document.uri, diagnostics);

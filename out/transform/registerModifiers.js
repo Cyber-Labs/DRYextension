@@ -12,12 +12,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerModifiers = exports.DrycoCodeActionsProvider = void 0;
 const vscode = require("vscode");
 const updateUtilFile_1 = require("./updateUtilFile");
-function DrycoCodeActions(diag, index) {
+function DrycoCodeActions(diag, originalNode) {
     return __awaiter(this, void 0, void 0, function* () {
         var action = new vscode.CodeAction(`Refactor repeated code`, vscode.CodeActionKind.QuickFix);
         action.diagnostics = [diag];
-        const wsPath = vscode.workspace.workspaceFolders ? vscode.workspace.workspaceFolders[0].uri.fsPath : ""; // gets the path of the first workspace folder
-        const filePath = vscode.Uri.file(wsPath + '/dryco/utilFunctions.js');
+        const wsPath = vscode.workspace.workspaceFolders
+            ? vscode.workspace.workspaceFolders[0].uri.fsPath
+            : ""; // gets the path of the first workspace folder
+        const filePath = vscode.Uri.file(wsPath + "/dryco/utilFunctions.js");
         action.edit = new vscode.WorkspaceEdit();
         action.edit.createFile(filePath, { ignoreIfExists: true });
         var lastLine = 1000000;
@@ -25,7 +27,7 @@ function DrycoCodeActions(diag, index) {
             lastLine = document.eol + 1;
         });
         const wholeDocument = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(lastLine, 0));
-        const updatedCode = yield updateUtilFile_1.updateUtilFile(index);
+        const updatedCode = yield updateUtilFile_1.updateUtilFile(originalNode);
         const updateCode = new vscode.TextEdit(wholeDocument, updatedCode);
         action.edit.set(filePath, [updateCode]);
         // vscode.workspace.applyEdit(action.edit);
@@ -33,32 +35,25 @@ function DrycoCodeActions(diag, index) {
     });
 }
 class DrycoCodeActionsProvider {
-    constructor(diagnostics) {
-        this.diags = diagnostics;
+    constructor(diagnostic, originalNode) {
+        this.diags = diagnostic;
+        this.originalNode = originalNode;
     }
     provideCodeActions(document, range) {
         return __awaiter(this, void 0, void 0, function* () {
-            var actions = [];
-            // let newAction = this.diags.forEach(async (diag, index) => {
-            //     return await DrycoCodeActions(diag, index);
-            // })
-            for (var i = 0; i < this.diags.length; i++) {
-                let newAction = yield DrycoCodeActions(this.diags[i], i);
-                actions.push(newAction);
-            }
-            return actions;
+            let newAction = yield DrycoCodeActions(this.diags, this.originalNode);
+            return [newAction];
         });
     }
 }
 exports.DrycoCodeActionsProvider = DrycoCodeActionsProvider;
 DrycoCodeActionsProvider.providedCodeActionKinds = [
-    vscode.CodeActionKind.QuickFix
+    vscode.CodeActionKind.QuickFix,
 ];
-function registerModifiers(diagnostics) {
-    vscode.languages.registerCodeActionsProvider('javascript', new DrycoCodeActionsProvider(diagnostics), {
-        providedCodeActionKinds: DrycoCodeActionsProvider.providedCodeActionKinds
+function registerModifiers(diagnostic, originalNode) {
+    vscode.languages.registerCodeActionsProvider("javascript", new DrycoCodeActionsProvider(diagnostic, originalNode), {
+        providedCodeActionKinds: DrycoCodeActionsProvider.providedCodeActionKinds,
     });
 }
 exports.registerModifiers = registerModifiers;
-;
 //# sourceMappingURL=registerModifiers.js.map

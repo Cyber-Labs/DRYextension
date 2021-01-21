@@ -1,104 +1,88 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deactivate = exports.activate = void 0;
+exports.activate = exports.diagnostics = exports.diagColl = void 0;
+const readCode_1 = require("./utils/readCode");
+const writeCode_1 = require("./utils/writeCode");
 const vscode = require("vscode");
 const transform_1 = require("./transform/transform");
-const updateDiags_1 = require("./transform/updateDiags");
 const fs = require("fs");
+const editor = vscode.window.activeTextEditor;
+if (!editor) {
+    throw new Error("No active editor");
+}
+exports.diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
+exports.diagnostics = [];
 function activate(context) {
     console.log('Congratulations, your extension "dryco" is now active!');
-    let disposable = vscode.commands.registerCommand('dryco.convertToArrowFunction', () => {
-        const code = readCode();
+    let disposable = vscode.commands.registerCommand("dryco.convertToArrowFunction", () => {
+        const code = readCode_1.readCode();
         const transformedCode = transform_1.transformToArrow(code);
-        write(transformedCode);
+        writeCode_1.write(transformedCode);
     });
     context.subscriptions.push(disposable);
-    context.subscriptions.push(vscode.commands.registerCommand('dryco.detectClone', () => {
+    context.subscriptions.push(vscode.commands.registerCommand("dryco.detectClone", () => {
         var _a;
-        const code = readCode();
+        exports.diagColl.dispose();
+        exports.diagnostics = [];
+        const code = readCode_1.readCode();
         let transformedCode;
         var currPath = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
         if (currPath) {
-            // if (navigator.userAgent.match(/Windows/i)){
-            // 	console.log(navigator.userAgent.match(/Windows/i));
-            // }
-            var os = require('os');
-            console.log(os.platform());
-            if (os.platform() === 'linux') {
+            var os = require("os");
+            if (os.platform() === "linux") {
                 var pathArray = currPath.split("/");
+                const currFile = pathArray[pathArray.length - 1];
                 pathArray.pop();
-                currPath = pathArray.join('/');
+                currPath = pathArray.join("/");
                 fs.readdir(currPath, (err, files) => {
                     files.forEach((file) => {
-                        fs.readFile(`${currPath}/${file}`, (err, data) => {
-                            if (err) {
-                                throw err;
-                            }
-                            console.log(data);
-                            transformedCode = transform_1.detectClone(code, data.toString(), `${currPath}/${file}`);
-                            if (transformedCode) {
-                                write(transformedCode);
-                            }
-                        });
+                        if (file !== currFile)
+                            fs.readFile(`${currPath}/${file}`, (error, data) => {
+                                if (error) {
+                                    throw error;
+                                }
+                                transformedCode = transform_1.detectClone(code, data.toString(), `${currPath}/${file}`);
+                                if (transformedCode) {
+                                    writeCode_1.write(transformedCode);
+                                }
+                            });
                     });
                 });
             }
             else {
                 var pathArray = currPath.split("\\");
+                const currFile = pathArray[pathArray.length - 1];
                 pathArray.pop();
-                currPath = pathArray.join('\\');
+                currPath = pathArray.join("\\");
                 fs.readdir(currPath, (err, files) => {
                     files.forEach((file) => {
-                        fs.readFile(`${currPath}\\${file}`, (err, data) => {
-                            if (err) {
-                                throw err;
-                            }
-                            console.log(data);
-                            transformedCode = transform_1.detectClone(code, data.toString(), `${currPath}\\${file}`);
-                            if (transformedCode) {
-                                write(transformedCode);
-                            }
-                        });
+                        if (file !== currFile)
+                            fs.readFile(`${currPath}\\${file}`, (error, data) => {
+                                if (error) {
+                                    throw error;
+                                }
+                                transformedCode = transform_1.detectClone(code, data.toString(), `${currPath}\\${file}`);
+                                if (transformedCode) {
+                                    writeCode_1.write(transformedCode);
+                                }
+                            });
                     });
                 });
             }
         }
-        const editor = vscode.window.activeTextEditor;
-        const drycoDiagnostics = vscode.languages.createDiagnosticCollection('Dryco');
-        if (!editor) {
-            throw new Error("No active editor");
-        }
-        const diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
         if (vscode.window.activeTextEditor) {
-            updateDiags_1.updateDiags(vscode.window.activeTextEditor.document, diagColl);
+            // updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
         const diag = vscode.window.onDidChangeActiveTextEditor;
         if (diag && vscode.window.activeTextEditor) {
-            updateDiags_1.updateDiags(vscode.window.activeTextEditor.document, drycoDiagnostics);
+            exports.diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
+            // updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
-        vscode.workspace.onDidChangeTextDocument(e => updateDiags_1.updateDiags(e.document, drycoDiagnostics));
-        vscode.workspace.onDidCloseTextDocument(doc => drycoDiagnostics.delete(doc.uri));
+        // vscode.workspace.onDidChangeTextDocument((e) =>
+        //   updateDiags(e.document, diagColl)
+        // );
+        vscode.workspace.onDidCloseTextDocument((doc) => exports.diagColl.delete(doc.uri));
     }));
 }
 exports.activate = activate;
-function readCode() {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        throw new Error("No active editor");
-    }
-    return editor.document.getText();
-}
-function write(code) {
-    const editor = vscode.window.activeTextEditor;
-    if (!editor) {
-        throw new Error("No active editor");
-    }
-    const edit = new vscode.WorkspaceEdit();
-    const wholeDocument = new vscode.Range(new vscode.Position(0, 0), new vscode.Position(editor.document.lineCount, 0));
-    const updateCode = new vscode.TextEdit(wholeDocument, code);
-    edit.set(editor.document.uri, [updateCode]);
-    vscode.workspace.applyEdit(edit);
-}
-function deactivate() { }
-exports.deactivate = deactivate;
 //# sourceMappingURL=extension.js.map

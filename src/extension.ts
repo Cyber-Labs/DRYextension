@@ -5,6 +5,15 @@ import { transformToArrow, detectClone } from "./transform/transform";
 import { updateDiags } from "./transform/updateDiags";
 import * as fs from "fs";
 
+const editor = vscode.window.activeTextEditor;
+if (!editor) {
+  throw new Error("No active editor");
+}
+export var diagColl = vscode.languages.createDiagnosticCollection(
+  `Dryco ${editor}`
+);
+export var diagnostics : vscode.Diagnostic[] = [];
+
 export function activate(context: vscode.ExtensionContext) {
   console.log('Congratulations, your extension "dryco" is now active!');
 
@@ -18,9 +27,11 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(disposable);
-
+      
   context.subscriptions.push(
     vscode.commands.registerCommand("dryco.detectClone", () => {
+      diagColl.dispose();
+      diagnostics = [];
       const code = readCode();
       let transformedCode;
 
@@ -29,10 +40,12 @@ export function activate(context: vscode.ExtensionContext) {
         var os = require("os");
         if (os.platform() === "linux") {
           var pathArray = currPath.split("/");
+          const currFile = pathArray[pathArray.length-1];
           pathArray.pop();
           currPath = pathArray.join("/");
           fs.readdir(currPath, (err, files: string[]) => {
             files.forEach((file) => {
+              if(file!==currFile)
               fs.readFile(`${currPath}/${file}`, (error, data) => {
                 if (error) {
                   throw error;
@@ -50,10 +63,12 @@ export function activate(context: vscode.ExtensionContext) {
           });
         } else {
           var pathArray = currPath.split("\\");
+          const currFile = pathArray[pathArray.length -1];
           pathArray.pop();
           currPath = pathArray.join("\\");
           fs.readdir(currPath, (err, files: string[]) => {
             files.forEach((file) => {
+              if(file!==currFile)
               fs.readFile(`${currPath}\\${file}`, (error, data) => {
                 if (error) {
                   throw error;
@@ -71,28 +86,20 @@ export function activate(context: vscode.ExtensionContext) {
           });
         }
       }
-
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        throw new Error("No active editor");
-      }
-      var diagColl = vscode.languages.createDiagnosticCollection(
-        `Dryco ${editor}`
-      );
       if (vscode.window.activeTextEditor) {
-        updateDiags(vscode.window.activeTextEditor.document, diagColl);
+        // updateDiags(vscode.window.activeTextEditor.document, diagColl);
       }
       const diag = vscode.window.onDidChangeActiveTextEditor;
       if (diag && vscode.window.activeTextEditor) {
         diagColl = vscode.languages.createDiagnosticCollection(
           `Dryco ${editor}`
         );
-        updateDiags(vscode.window.activeTextEditor.document, diagColl);
+        // updateDiags(vscode.window.activeTextEditor.document, diagColl);
       }
 
-      vscode.workspace.onDidChangeTextDocument((e) =>
-        updateDiags(e.document, diagColl)
-      );
+      // vscode.workspace.onDidChangeTextDocument((e) =>
+      //   updateDiags(e.document, diagColl)
+      // );
       vscode.workspace.onDidCloseTextDocument((doc) =>
         diagColl.delete(doc.uri)
       );

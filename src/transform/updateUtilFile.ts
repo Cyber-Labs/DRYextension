@@ -4,9 +4,8 @@ import generate from "@babel/generator";
 import * as t from "@babel/types";
 import { Nodes, toArrowFunction } from "./transform";
 
-export async function updateUtilFile(index: number): Promise<string> {
+export async function updateUtilFile(repeatedNode: t.File): Promise<string> {
 
-    const repeatedNode = Nodes[index];
     var convertedToFunctionNode;
     traverse(repeatedNode, {
         FunctionDeclaration(path) {
