@@ -20,10 +20,11 @@ function activate(context) {
         writeCode_1.write(transformedCode);
     });
     context.subscriptions.push(disposable);
-    context.subscriptions.push(vscode.commands.registerCommand("dryco.detectClone", () => {
+    let disposable2 = vscode.commands.registerCommand("dryco.detectClone", () => {
         var _a;
         exports.diagColl.dispose();
         exports.diagnostics = [];
+        disposable2.dispose();
         const code = readCode_1.readCode();
         let transformedCode;
         var currPath = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
@@ -78,11 +79,9 @@ function activate(context) {
             exports.diagColl = vscode.languages.createDiagnosticCollection(`Dryco ${editor}`);
             // updateDiags(vscode.window.activeTextEditor.document, diagColl);
         }
-        // vscode.workspace.onDidChangeTextDocument((e) =>
-        //   updateDiags(e.document, diagColl)
-        // );
         vscode.workspace.onDidCloseTextDocument((doc) => exports.diagColl.delete(doc.uri));
-    }));
+    });
+    context.subscriptions.push(disposable2);
 }
 exports.activate = activate;
 //# sourceMappingURL=extension.js.map

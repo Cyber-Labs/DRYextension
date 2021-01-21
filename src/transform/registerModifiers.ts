@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { Nodes } from "./transform";
+import { convertPath } from "../utils/convertPath"
 import { updateUtilFile } from "./updateUtilFile";
 import * as t from "@babel/types";
 

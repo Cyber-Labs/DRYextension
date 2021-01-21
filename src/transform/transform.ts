@@ -5,9 +5,8 @@ import traverse from "@babel/traverse";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
 import { diagColl, diagnostics } from "../extension";
-
-
 import { createDiagnostics } from "./createDiagnostics";
+
 
 export var firstInstanceSt:{line:number,column:number}[] = [];
 export var firstInstanceEnd:{line:number,column:number}[] = [];

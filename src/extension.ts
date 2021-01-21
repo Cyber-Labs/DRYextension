@@ -4,6 +4,7 @@ import * as vscode from "vscode";
 import { transformToArrow, detectClone } from "./transform/transform";
 import { updateDiags } from "./transform/updateDiags";
 import * as fs from "fs";
+import { DrycoCodeActionsProvider } from "./transform/registerModifiers";
 
 const editor = vscode.window.activeTextEditor;
 if (!editor) {
@@ -27,82 +28,81 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(disposable);
-      
-  context.subscriptions.push(
-    vscode.commands.registerCommand("dryco.detectClone", () => {
-      diagColl.dispose();
-      diagnostics = [];
-      const code = readCode();
-      let transformedCode;
 
-      var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
-      if (currPath) {
-        var os = require("os");
-        if (os.platform() === "linux") {
-          var pathArray = currPath.split("/");
-          const currFile = pathArray[pathArray.length-1];
-          pathArray.pop();
-          currPath = pathArray.join("/");
-          fs.readdir(currPath, (err, files: string[]) => {
-            files.forEach((file) => {
-              if(file!==currFile)
-              fs.readFile(`${currPath}/${file}`, (error, data) => {
-                if (error) {
-                  throw error;
-                }
-                transformedCode = detectClone(
-                  code,
-                  data.toString(),
-                  `${currPath}/${file}`
-                );
-                if (transformedCode) {
-                  write(transformedCode);
-                }
-              });
+  let disposable2 = vscode.commands.registerCommand("dryco.detectClone", () => {
+    diagColl.dispose();
+    diagnostics = [];
+
+    disposable2.dispose();
+
+    const code = readCode();
+    let transformedCode;
+
+    var currPath = vscode.window.activeTextEditor?.document.uri.fsPath;
+    if (currPath) {
+      var os = require("os");
+      if (os.platform() === "linux") {
+        var pathArray = currPath.split("/");
+        const currFile = pathArray[pathArray.length-1];
+        pathArray.pop();
+        currPath = pathArray.join("/");
+        fs.readdir(currPath, (err, files: string[]) => {
+          files.forEach((file) => {
+            if(file!==currFile)
+            fs.readFile(`${currPath}/${file}`, (error, data) => {
+              if (error) {
+                throw error;
+              }
+              transformedCode = detectClone(
+                code,
+                data.toString(),
+                `${currPath}/${file}`
+              );
+              if (transformedCode) {
+                write(transformedCode);
+              }
             });
           });
-        } else {
-          var pathArray = currPath.split("\\");
-          const currFile = pathArray[pathArray.length -1];
-          pathArray.pop();
-          currPath = pathArray.join("\\");
-          fs.readdir(currPath, (err, files: string[]) => {
-            files.forEach((file) => {
-              if(file!==currFile)
-              fs.readFile(`${currPath}\\${file}`, (error, data) => {
-                if (error) {
-                  throw error;
-                }
-                transformedCode = detectClone(
-                  code,
-                  data.toString(),
-                  `${currPath}\\${file}`
-                );
-                if (transformedCode) {
-                  write(transformedCode);
-                }
-              });
+        });
+      } else {
+        var pathArray = currPath.split("\\");
+        const currFile = pathArray[pathArray.length -1];
+        pathArray.pop();
+        currPath = pathArray.join("\\");
+        fs.readdir(currPath, (err, files: string[]) => {
+          files.forEach((file) => {
+            if(file!==currFile)
+            fs.readFile(`${currPath}\\${file}`, (error, data) => {
+              if (error) {
+                throw error;
+              }
+              transformedCode = detectClone(
+                code,
+                data.toString(),
+                `${currPath}\\${file}`
+              );
+              if (transformedCode) {
+                write(transformedCode);
+              }
             });
           });
-        }
+        });
       }
-      if (vscode.window.activeTextEditor) {
-        // updateDiags(vscode.window.activeTextEditor.document, diagColl);
-      }
-      const diag = vscode.window.onDidChangeActiveTextEditor;
-      if (diag && vscode.window.activeTextEditor) {
-        diagColl = vscode.languages.createDiagnosticCollection(
-          `Dryco ${editor}`
-        );
-        // updateDiags(vscode.window.activeTextEditor.document, diagColl);
-      }
-
-      // vscode.workspace.onDidChangeTextDocument((e) =>
-      //   updateDiags(e.document, diagColl)
-      // );
-      vscode.workspace.onDidCloseTextDocument((doc) =>
-        diagColl.delete(doc.uri)
+    }
+    if (vscode.window.activeTextEditor) {
+      // updateDiags(vscode.window.activeTextEditor.document, diagColl);
+    }
+    const diag = vscode.window.onDidChangeActiveTextEditor;
+    if (diag && vscode.window.activeTextEditor) {
+      diagColl = vscode.languages.createDiagnosticCollection(
+        `Dryco ${editor}`
       );
-    })
-  );
+      // updateDiags(vscode.window.activeTextEditor.document, diagColl);
+    }
+    vscode.workspace.onDidCloseTextDocument((doc) =>
+      diagColl.delete(doc.uri)
+    );
+  })
+      
+  context.subscriptions.push(disposable2);
 }
