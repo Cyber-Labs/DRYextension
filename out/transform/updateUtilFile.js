@@ -15,9 +15,8 @@ const traverse_1 = require("@babel/traverse");
 const generator_1 = require("@babel/generator");
 const t = require("@babel/types");
 const transform_1 = require("./transform");
-function updateUtilFile(index) {
+function updateUtilFile(repeatedNode) {
     return __awaiter(this, void 0, void 0, function* () {
-        const repeatedNode = transform_1.Nodes[index];
         var convertedToFunctionNode;
         traverse_1.default(repeatedNode, {
             FunctionDeclaration(path) {

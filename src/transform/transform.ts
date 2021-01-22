@@ -4,6 +4,9 @@ import * as vscode from 'vscode';
 import traverse from "@babel/traverse";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
+import { diagColl, diagnostics } from "../extension";
+import { createDiagnostics } from "./createDiagnostics";
+
 
 export var firstInstanceSt:{line:number,column:number}[] = [];
 export var firstInstanceEnd:{line:number,column:number}[] = [];
@@ -120,14 +123,19 @@ function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.
         }
     });
     if(generate(ast1).code === generate(ast2).code){
-        Nodes.push(originalNode);
-        firstInstanceSt.push(loc1 ? { line : loc1.start.line,column : loc1.start.column}:{line:0,column:0});
-        firstInstanceEnd.push(loc1 ? {line : loc1.end.line,column : loc1.end.column}:{line:0,column:0});
-        repInstanceSt.push(loc2 ? {line : loc2.start.line,column : loc2.start.column}:{line:0,column:0});
-        repInstanceEnd.push(loc2 ? {line : loc2.end.line,column : loc2.end.column}:{line:0,column:0});
-        uriSecond.push(secondURI);
-        // console.log(`Clone detected at lines ${path1.node.loc ? path1.node.loc.start.line:""}:${path1.node.loc ? path1.node.loc.end.line:""} and ${path2.node.loc ? path2.node.loc.start.line:""}:${path2.node.loc ? path2.node.loc.end.line:""}`);
-        vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line:""}:${loc1 ? loc1.end.line:""} and ${loc2 ? loc2.start.line:""}:${loc2 ? loc2.end.line:""}`);
+        // Nodes.push(originalNode);
+        // firstInstanceSt.push(loc1 ? { line : loc1.start.line,column : loc1.start.column}:{line:0,column:0});
+        // firstInstanceEnd.push(loc1 ? {line : loc1.end.line,column : loc1.end.column}:{line:0,column:0});
+        // repInstanceSt.push(loc2 ? {line : loc2.start.line,column : loc2.start.column}:{line:0,column:0});
+        // repInstanceEnd.push(loc2 ? {line : loc2.end.line,column : loc2.end.column}:{line:0,column:0});
+        // uriSecond.push(secondURI);
+        var diag:vscode.Diagnostic;
+        if(vscode.window.activeTextEditor?.document){
+            diag = createDiagnostics(vscode.window.activeTextEditor.document,originalNode, loc1, loc2, secondURI);
+            diagnostics.push(diag);
+            diagColl.set(vscode.window.activeTextEditor.document.uri,diagnostics);
+            vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line:""}:${loc1 ? loc1.end.line:""} and ${loc2 ? loc2.start.line:""}:${loc2 ? loc2.end.line:""}`);
+        }
     }
 }
 

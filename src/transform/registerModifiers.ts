@@ -1,10 +1,11 @@
 import * as vscode from "vscode";
-import { Nodes } from "./transform";
+import { convertPath } from "../utils/convertPath"
 import { updateUtilFile } from "./updateUtilFile";
+import * as t from "@babel/types";
 
 async function DrycoCodeActions(
   diag: vscode.Diagnostic,
-  index: number
+  originalNode: t.File
 ): Promise<vscode.CodeAction> {
   var action = new vscode.CodeAction(
     `Refactor repeated code`,
@@ -25,7 +26,7 @@ async function DrycoCodeActions(
     new vscode.Position(0, 0),
     new vscode.Position(lastLine, 0)
   );
-  const updatedCode = await updateUtilFile(index);
+  const updatedCode = await updateUtilFile(originalNode);
   const updateCode = new vscode.TextEdit(wholeDocument, updatedCode);
   action.edit.set(filePath, [updateCode]);
   // vscode.workspace.applyEdit(action.edit);
@@ -33,10 +34,12 @@ async function DrycoCodeActions(
 }
 
 export class DrycoCodeActionsProvider implements vscode.CodeActionProvider {
-  diags: vscode.Diagnostic[];
+  diags: vscode.Diagnostic;
+  originalNode: t.File;
 
-  constructor(diagnostics: vscode.Diagnostic[]) {
-    this.diags = diagnostics;
+  constructor(diagnostic: vscode.Diagnostic, originalNode: t.File) {
+    this.diags = diagnostic;
+    this.originalNode = originalNode;
   }
 
   public static readonly providedCodeActionKinds = [
@@ -47,19 +50,15 @@ export class DrycoCodeActionsProvider implements vscode.CodeActionProvider {
     document: vscode.TextDocument,
     range: vscode.Range
   ): Promise<vscode.CodeAction[] | undefined> {
-    var actions: vscode.CodeAction[] = [];
-    for (var i = 0; i < this.diags.length; i++) {
-      let newAction = await DrycoCodeActions(this.diags[i], i);
-      actions.push(newAction);
-    }
-    return actions;
+    let newAction = await DrycoCodeActions(this.diags, this.originalNode);
+    return [newAction];
   }
 }
 
-export function registerModifiers(diagnostics: vscode.Diagnostic[]) {
+export function registerModifiers(diagnostic: vscode.Diagnostic, originalNode: t.File) {
   vscode.languages.registerCodeActionsProvider(
     "javascript",
-    new DrycoCodeActionsProvider(diagnostics),
+    new DrycoCodeActionsProvider(diagnostic, originalNode),
     {
       providedCodeActionKinds: DrycoCodeActionsProvider.providedCodeActionKinds,
     }
