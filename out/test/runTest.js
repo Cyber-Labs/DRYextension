@@ -19,7 +19,7 @@ function main() {
             const extensionDevelopmentPath = path.resolve(__dirname, '../../');
             // The path to test runner
             // Passed to --extensionTestsPath
-            const extensionTestsPath = path.resolve(__dirname, './suite/index');
+            const extensionTestsPath = path.resolve(__dirname, '../../../dryco-test');
             // Download VS Code, unzip it and run the integration test
             yield vscode_test_1.runTests({ extensionDevelopmentPath, extensionTestsPath });
         }

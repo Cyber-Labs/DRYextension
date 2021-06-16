@@ -15,7 +15,7 @@ async function DrycoCodeActions(
   const wsPath = vscode.workspace.workspaceFolders
     ? vscode.workspace.workspaceFolders[0].uri.fsPath
     : ""; // gets the path of the first workspace folder
-  const filePath = vscode.Uri.file(wsPath + "/dryco/utilFunctions.js");
+  const filePath = vscode.Uri.file(wsPath + "\\utilFunctions.js");
   action.edit = new vscode.WorkspaceEdit();
   action.edit.createFile(filePath, { ignoreIfExists: true });
   var lastLine = 1000000;
