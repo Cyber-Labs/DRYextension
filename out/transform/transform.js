@@ -9,7 +9,7 @@ const traverse_1 = require("@babel/traverse");
 const generator_1 = require("@babel/generator");
 const t = require("@babel/types");
 const extension_1 = require("../extension");
-const createDiagnostics_1 = require("./createDiagnostics");
+const diagnostics_1 = require("../diagnostics");
 const currFile = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
 exports.firstInstanceSt = [];
 exports.firstInstanceEnd = [];
@@ -122,7 +122,7 @@ function compareAst(ast1, ast2, loc1, loc2, secondURI) {
     // console.log(currFile, secondURI, sameFile, loc1, loc2, compareLocs(loc1, loc2));
     if ((!sameFile || loc1.start.line >= loc2.start.line) && generator_1.default(ast1).code === generator_1.default(ast2).code && (!sameFile || !compareLocs(loc1, loc2))) {
         if ((_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document) {
-            const diag = createDiagnostics_1.createDiagnostics(vscode.window.activeTextEditor.document, originalNode, loc1, loc2, secondURI);
+            const diag = diagnostics_1.createDiagnostics(vscode.window.activeTextEditor.document, loc1, loc2, secondURI);
             extension_1.diagnostics.add(diag);
             extension_1.diagColl.set(vscode.window.activeTextEditor.document.uri, Array.from(extension_1.diagnostics));
             vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line : ""}:${loc1 ? loc1.end.line : ""} and ${loc2 ? loc2.start.line : ""}:${loc2 ? loc2.end.line : ""}`);

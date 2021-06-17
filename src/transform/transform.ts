@@ -5,7 +5,7 @@ import traverse from "@babel/traverse";
 import generate from "@babel/generator";
 import * as t from "@babel/types";
 import { diagColl, diagnostics } from "../extension";
-import { createDiagnostics } from "./createDiagnostics";
+import { createDiagnostics } from "../diagnostics";
 
 
 const currFile = vscode.window.activeTextEditor?.document.uri.fsPath;
@@ -130,7 +130,7 @@ function compareAst(ast1: t.File, ast2: t.File, loc1: t.SourceLocation, loc2: t.
     // console.log(currFile, secondURI, sameFile, loc1, loc2, compareLocs(loc1, loc2));
     if((!sameFile || loc1.start.line >= loc2.start.line) && generate(ast1).code === generate(ast2).code && (!sameFile || !compareLocs(loc1, loc2))){
         if(vscode.window.activeTextEditor?.document){
-            const diag = createDiagnostics(vscode.window.activeTextEditor.document,originalNode, loc1, loc2, secondURI);
+            const diag = createDiagnostics(vscode.window.activeTextEditor.document, loc1, loc2, secondURI);
             diagnostics.add(diag);
             diagColl.set(vscode.window.activeTextEditor.document.uri,Array.from(diagnostics));
             vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line:""}:${loc1 ? loc1.end.line:""} and ${loc2 ? loc2.start.line:""}:${loc2 ? loc2.end.line:""}`);
