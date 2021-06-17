@@ -36,7 +36,7 @@ Above operation will open the `Extension Development Host` and can be used to te
 
 To run extension press `CTRL+SHIFT+P` and type `Detect Clone` to run the extension.
 
-![](./src/images/Detect-Clone-Command.jpg)
+![](./src/images/Detect-Clone-Command.png)
 
 This will select all structurally similar code and provide VS Code Diagnostics with `Warning`.
 Diagnostics also contains the locations of all the other instances of the same block of code in all the files of current directory.
