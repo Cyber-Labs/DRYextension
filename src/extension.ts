@@ -15,7 +15,7 @@ export var codeActions: vscode.Disposable[] = [];
 export function activate(context: vscode.ExtensionContext) {
   console.log('Congratulations, your extension "dryco" is now active!');
 
-  let disposable2 = vscode.commands.registerCommand("dryco.detectClone", () => {
+  vscode.commands.registerCommand("dryco.detectClone", () => {
     const drycoDiagnostics = vscode.languages.createDiagnosticCollection("Dryco");
     context.subscriptions.push(drycoDiagnostics);
     subscribeToDocumentChanges(context, drycoDiagnostics);
@@ -25,6 +25,4 @@ export function activate(context: vscode.ExtensionContext) {
       })
     );
   });
-
-  context.subscriptions.push(disposable2);
 }

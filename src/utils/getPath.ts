@@ -19,15 +19,12 @@ export function getCurrDir(): string {
   return "";
 }
 
-export function getCurrFile(filename: string): string {
+export function getCurrFile(): string {
   var currPath = getCurrDir();
-  var currFilePath = "";
-  if (filename) {
-    if (os.platform() === "linux") {
-      currFilePath = currPath + "/" + filename;
-    } else {
-      currFilePath = currPath + "\\" + filename;
-    }
-  }
-  return currFilePath;
+  var fileName = currPath.split('/').pop();
+  fileName = currPath.split('\\').pop();
+  if(fileName)
+  {return fileName;}
+
+  return "";
 }

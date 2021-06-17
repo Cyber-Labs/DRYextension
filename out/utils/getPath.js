@@ -22,18 +22,14 @@ function getCurrDir() {
     return "";
 }
 exports.getCurrDir = getCurrDir;
-function getCurrFile(filename) {
+function getCurrFile() {
     var currPath = getCurrDir();
-    var currFilePath = "";
-    if (filename) {
-        if (os.platform() === "linux") {
-            currFilePath = currPath + "/" + filename;
-        }
-        else {
-            currFilePath = currPath + "\\" + filename;
-        }
+    var fileName = currPath.split('/').pop();
+    fileName = currPath.split('\\').pop();
+    if (fileName) {
+        return fileName;
     }
-    return currFilePath;
+    return "";
 }
 exports.getCurrFile = getCurrFile;
 //# sourceMappingURL=getPath.js.map
