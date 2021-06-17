@@ -5,9 +5,11 @@ import * as t from "@babel/types";
 
 
 export function createDiagnostics(document: vscode.TextDocument,originalNode: t.File, loc1: t.SourceLocation, loc2: t.SourceLocation, secondURI:string): vscode.Diagnostic {
+    console.log(document, originalNode, loc1, loc2, secondURI);
     let range = new vscode.Range(
         new vscode.Position(loc1.start.line, loc1.start.column), new vscode.Position(loc1.end.line, loc1.end.column)
     );
+    console.log("range", range);
     let diag1 = new vscode.Diagnostic(
         range,
         'WET Code detected!',
@@ -19,5 +21,6 @@ export function createDiagnostics(document: vscode.TextDocument,originalNode: t.
             new vscode.Range(new vscode.Position(loc2.start.line, loc2.start.column), new vscode.Position(loc2.end.line, loc2.end.column))),
         'Similar Code here')];
     registerModifiers(diag1, originalNode);
+    console.log("diag1", diag1);
     return diag1;
 }

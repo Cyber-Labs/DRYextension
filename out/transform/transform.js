@@ -1,4 +1,5 @@
 "use strict";
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.detectClone = exports.toArrowFunction = exports.transformToArrow = exports.Nodes = exports.uriSecond = exports.repInstanceEnd = exports.repInstanceSt = exports.firstInstanceEnd = exports.firstInstanceSt = void 0;
 /* eslint-disable @typescript-eslint/naming-convention */
@@ -9,12 +10,16 @@ const generator_1 = require("@babel/generator");
 const t = require("@babel/types");
 const extension_1 = require("../extension");
 const createDiagnostics_1 = require("./createDiagnostics");
+const currFile = (_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document.uri.fsPath;
 exports.firstInstanceSt = [];
 exports.firstInstanceEnd = [];
 exports.repInstanceSt = [];
 exports.repInstanceEnd = [];
 exports.uriSecond = [];
 exports.Nodes = [];
+const compareLocs = (loc1, loc2) => {
+    return loc1.start.line === loc2.start.line && loc1.end.line === loc2.end.line && loc1.start.column === loc2.start.column && loc1.end.column === loc2.end.column;
+};
 // Convert Normal function to Arrow function
 function transformToArrow(code) {
     const ast = parser_1.parse(code);
@@ -98,13 +103,12 @@ function detectClone(code, code2, secondURI) {
     //         });
     //     }
     // });
-    return generator_1.default(ast).code;
 }
 exports.detectClone = detectClone;
 function compareAst(ast1, ast2, loc1, loc2, secondURI) {
     var _a;
     const originalNode = parser_1.parse(generator_1.default(ast1).code);
-    console.log(originalNode);
+    const sameFile = (currFile === secondURI);
     traverse_1.default(ast1, {
         Identifier(path) {
             path.node.name = "a";
@@ -115,18 +119,12 @@ function compareAst(ast1, ast2, loc1, loc2, secondURI) {
             path.node.name = "a";
         }
     });
-    if (generator_1.default(ast1).code === generator_1.default(ast2).code) {
-        // Nodes.push(originalNode);
-        // firstInstanceSt.push(loc1 ? { line : loc1.start.line,column : loc1.start.column}:{line:0,column:0});
-        // firstInstanceEnd.push(loc1 ? {line : loc1.end.line,column : loc1.end.column}:{line:0,column:0});
-        // repInstanceSt.push(loc2 ? {line : loc2.start.line,column : loc2.start.column}:{line:0,column:0});
-        // repInstanceEnd.push(loc2 ? {line : loc2.end.line,column : loc2.end.column}:{line:0,column:0});
-        // uriSecond.push(secondURI);
-        var diag;
+    // console.log(currFile, secondURI, sameFile, loc1, loc2, compareLocs(loc1, loc2));
+    if ((!sameFile || loc1.start.line >= loc2.start.line) && generator_1.default(ast1).code === generator_1.default(ast2).code && (!sameFile || !compareLocs(loc1, loc2))) {
         if ((_a = vscode.window.activeTextEditor) === null || _a === void 0 ? void 0 : _a.document) {
-            diag = createDiagnostics_1.createDiagnostics(vscode.window.activeTextEditor.document, originalNode, loc1, loc2, secondURI);
-            extension_1.diagnostics.push(diag);
-            extension_1.diagColl.set(vscode.window.activeTextEditor.document.uri, extension_1.diagnostics);
+            const diag = createDiagnostics_1.createDiagnostics(vscode.window.activeTextEditor.document, originalNode, loc1, loc2, secondURI);
+            extension_1.diagnostics.add(diag);
+            extension_1.diagColl.set(vscode.window.activeTextEditor.document.uri, Array.from(extension_1.diagnostics));
             vscode.window.showInformationMessage(`Structurally similar code detected at lines ${loc1 ? loc1.start.line : ""}:${loc1 ? loc1.end.line : ""} and ${loc2 ? loc2.start.line : ""}:${loc2 ? loc2.end.line : ""}`);
         }
     }
