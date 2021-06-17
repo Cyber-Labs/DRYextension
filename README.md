@@ -1,11 +1,12 @@
-# dryco
+# Dryco
 
-Dryco is an vscode extension which allows a new to programming user to write their code like a pro.
+Dryco is a VS Code extension which can help users to write efficient code by detecting and refactoring similar block of code.
 
 ## Features
 
-Dryco makes your code more DRY(Don't Repeat Yourself), reliable and readable by shifting all reapeated blocks of code into one file and importing them in our targel file and using them, this save us lots of size.
+Dryco helps im keeping the code DRY(Don't Repeat Yourself), reliable and readable by shifting all repeated blocks of code in one file and importing them in target files.
 
+![](./src/images/Dryco Sample Working.gif)
 <!-- For example if there is an image subfolder under your extension project workspace:
 
 \!\[feature X\]\(images/feature-x.png\)
@@ -27,15 +28,20 @@ After cloning this repo, open it in VSCode and install all npm dependencies or p
 > npm run compile
 
 
-After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `Enter key`.
+After installing the required dependencies press `F5 key` and type `VS Code Extension Development` in search bar and press `Enter key` or you can can press `CTRL + F5` or go to the debug menu in VS Code Sidebar and select `Run Extension`.
 
-Above actions will open an extention development environment and can be used to test all features of this extention.
+![](./src/images/Run Extension Command.jpg)
 
-To run extension press `CTRL+SHIFT+P` and type `Detect Clone`, this command will detect repeated blocks of code and represent it by underlining(in yellow color).
+Above operation will open the `Extension Development Host` and can be used to test the extension.
 
-On hovering your courser above the highlighted code, it will tell user the locations of repeated code blocks(i.e. line number and file name).
+To run extension press `CTRL+SHIFT+P` and type `Detect Clone` to run the extension.
 
-On hovering your courser above the highlighted code, user also encounters `quick fix` option which on clicking creates a folder `dryco`(folder name) in the root directory of current project and move all repeated blocks of code in current file to the `utilFunctions.js` file in `dryco` folder and then exporting it from there.
+![](./src/images/Detect Clone Command.jpg)
+
+This will select all structurally similar code and provide VS Code Diagnostics with `Warning`.
+Diagnostics also contains the locations of all the other instances of the same block of code in all the files of current directory.
+
+User can also use the `Quick Fix` code action provided to move the block of code in `utilFunctions.js` file (If it does not exists, it creates a new file with this name). It removes all the instances of this block and adds an `import statement` at the required places.
 
 <!-- ## Release Notes
 
